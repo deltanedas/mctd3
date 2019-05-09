@@ -7,7 +7,7 @@ If you encounter any bugs please create an issue in the Issues tab.
 # Building
 
 **Dependencies**
-g++-8, SDL2, SDL2_image, SDL2_ttf, [SDL2_Font Cache \(C++ version\)](https://github.com/deltanedas/SDL_FontCache/), pthreads
+g++-8, SDL2, SDL2_image, SDL2_ttf, [SDL2_fontcache \(C++ version\)](https://github.com/deltanedas/SDL_fontcache/), pthreads
 
 **On \*NIX**
 1. `make`
