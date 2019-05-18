@@ -31,3 +31,5 @@ $(EXEC_FILE): $(OBJECTS)
 clean:
 	rm -rf $(BUILDDIR)
 	rm -f $(EXEC_FILE)
+
+remake: clean $(EXEC_FILE)

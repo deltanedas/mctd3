@@ -85,9 +85,10 @@ std::string Vec2::to_string() {
 
 // TextureType
 
-TextureType::TextureType(std::string path, Vec2 scale) {
-	setTexture(path);
+TextureType::TextureType(std::string path, Vec2 scale, bool clip) {
+	setClip(clip);
 	setScale(scale);
+	setPath(path);
 }
 
 TextureType::~TextureType() {
@@ -96,32 +97,45 @@ TextureType::~TextureType() {
 	}
 }
 
-void TextureType::setTexture(std::string path) {
-	SDL_ClearError();
-	SDL_Surface* surface = IMG_Load(path.c_str());
-	if (surface == nullptr) {
-		throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
+void TextureType::setPath(std::string path) {
+	if (!path.empty()) {
+		SDL_ClearError();
+		SDL_Surface* surface = IMG_Load(path.c_str());
+		if (surface == nullptr) {
+			throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
+		}
+		Texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_FreeSurface(surface);
+		Path = path;
 	}
-	Texture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
 }
 
 void TextureType::setScale(Vec2 scale) {
-	if (scale.X == 0.0) {
-		scale.X = 1;
-	}
-	if (scale.Y == 0.0) {
-		scale.Y = 1;
-	}
+	if (scale.X == 0.0) scale.X = 1;
+	if (scale.Y == 0.0) scale.Y = 1;
 	Scale = scale;
+	setPath(Path);
+}
+
+void TextureType::setClip(bool clip) {
+	Clip = clip;
+	setPath(Path);
 }
 
 SDL_Texture* TextureType::getTexture() {
 	return Texture;
 }
 
+std::string TextureType::TextureType::getPath() {
+	return Path;
+}
+
 Vec2 TextureType::getScale() {
 	return Scale;
+}
+
+bool TextureType::getClip() {
+	return Clip;
 }
 
 // TextType

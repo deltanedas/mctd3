@@ -31,5 +31,8 @@ enum class Level {
 };
 
 void loggerf(std::string str, Level level = Level::INFO);
+void loggerf(int str, Level level = Level::INFO);
+void loggerf(double str, Level level = Level::INFO);
+void loggerf(float str, Level level = Level::INFO);
 
 #endif

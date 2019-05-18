@@ -30,15 +30,25 @@ void setText(std::string text, int count) {
 }
 
 void oreDigCallback(EventType eventType) {
+	loggerf(1);
 	SDL_MouseButtonEvent e = eventType.MouseButtonEvent;
+	loggerf(2);
 	if (e.button == 1) {
+		loggerf(3);
 		if (eventType.Caller->isPointInBounds(e.x, e.y, true)) {
+			loggerf(4);
 			mineCount[eventType.Caller]++;
+			loggerf(5);
 			if (mineCount[eventType.Caller] == 8) {
+				loggerf(6);
 				label->getText()->setText("You are get diamonde!");
+				loggerf(7);
 				eventType.Caller->setEventCallback(EventEnum::MOUSE_DOWN);
+				loggerf(8);
 				eventType.Caller->setVisible(false);
+				loggerf(9);
 				std::thread resetThread(setText, defaultLabelText, 5); resetThread.detach();
+				loggerf(10);
 			}
 		}
 	}

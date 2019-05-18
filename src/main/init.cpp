@@ -3,7 +3,6 @@
 bool MCTD3_InitSDL() {
 	loggerf("Initialising SDL.", Level::DEBUG);
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-		int windowFlag;
 		if (SDL_CreateWindowAndRenderer(windowSize.X, windowSize.Y, SDL_WINDOW_RESIZABLE, &window, &renderer) == 0) {
 			if (MCTD3_fullscreen) {
 				loggerf("Entering fullscreen.", Level::DEBUG);

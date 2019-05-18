@@ -87,20 +87,24 @@ class Vec2 {
 class TextureType {
 	public:
 		TextureType() {}
-		TextureType(std::string path, Vec2 scale = Vec2(1.0, 1.0));
+		TextureType(std::string path, Vec2 scale = Vec2(1.0, 1.0), bool clip = false);
 		~TextureType();
 
 		// Setters
-		void setTexture(std::string path);
+		void setPath(std::string path);
 		void setScale(Vec2 scale);
+		void setClip(bool clip);
 
 		// Getters
 		SDL_Texture* getTexture();
+		std::string getPath();
 		Vec2 getScale();
+		bool getClip();
 	private:
 		SDL_Texture* Texture;
 		std::string Path;
 		Vec2 Scale;
+		bool Clip;
 };
 
 class ColourType {

@@ -52,3 +52,15 @@ void loggerf(std::string str, Level level) {
 				Colours[RED], text, Colours[RESET]); break;
 	}
 }
+
+void loggerf(int str, Level level) {
+	loggerf(std::to_string(str), level);
+}
+
+void loggerf(double str, Level level) {
+	loggerf(std::to_string(str), level);
+}
+
+void loggerf(float str, Level level) {
+	loggerf(std::to_string(str), level);
+}
