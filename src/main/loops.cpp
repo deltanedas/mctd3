@@ -49,21 +49,21 @@ bool MCTD3_RenderLoop() {
 			delete rect;
 
 			if (frame->getTexture() != nullptr) {
-				SDL_Rect* textureRect = new SDL_Rect();
-				TextureType* texture = frame->getTexture();
-				size.X *= texture->getScale().X;
-				size.Y *= texture->getScale().Y;
-				if (size.X < 1) size.X = 1;
-				if (size.Y < 1) size.Y = 1;
-				textureRect->x = pos.X;
-				textureRect->y = pos.Y;
-				textureRect->w = size.X;
-				textureRect->h = size.Y;
-				SDL_ClearError();
-				if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
-					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
-				}
-				delete textureRect;
+			SDL_Rect* textureRect = new SDL_Rect();
+			TextureType* texture = frame->getTexture();
+			size.X *= texture->getScale().X;
+			size.Y *= texture->getScale().Y;
+			if (size.X < 1) size.X = 1;
+			if (size.Y < 1) size.Y = 1;
+			textureRect->x = pos.X;
+			textureRect->y = pos.Y;
+			textureRect->w = size.X;
+			textureRect->h = size.Y;
+			SDL_ClearError();
+			if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
+				loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
+			}
+			delete textureRect;
 			}
 
 			if (frame->getText() != nullptr) {
@@ -83,6 +83,35 @@ bool MCTD3_RenderLoop() {
 						scale.y = size.Y / textSize.Y;
 					}
 					FC_DrawScale(font, renderer, pos.X, pos.Y, scale, text->getText());
+				}
+			}
+
+			if (frame->getAnimation() != nullptr) {
+				loggerf("hmm");
+				AnimationType* anim = frame->getAnimation();
+				loggerf("yes");
+				loggerf(anim != nullptr);
+				loggerf("nope");
+				if (anim->getFrames().size() > 0) {
+					loggerf("aha!");
+					TextureType* texture = anim->getFrames()[anim->getFrame()];
+					if (texture != nullptr) {
+						loggerf("john");
+						SDL_Rect* textureRect = new SDL_Rect();
+						size.X *= texture->getScale().X;
+						size.Y *= texture->getScale().Y;
+						if (size.X < 1) size.X = 1;
+						if (size.Y < 1) size.Y = 1;
+						textureRect->x = pos.X;
+						textureRect->y = pos.Y;
+						textureRect->w = size.X;
+						textureRect->h = size.Y;
+						SDL_ClearError();
+						if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
+							loggerf("Failed to render animation: " + std::string(SDL_GetError()), Level::WARN);
+						}
+						delete textureRect;
+					}
 				}
 			}
 		}

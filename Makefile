@@ -17,6 +17,9 @@ run: $(EXEC_FILE)
 debug: $(EXEC_FILE)
 	./$(EXEC_FILE) -d
 
+valgrind: $(EXEC_FILE)
+	valgrind --track-origins=yes ./$(EXEC_FILE) -d
+
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.cpp
 	mkdir -p $(BUILDDIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^

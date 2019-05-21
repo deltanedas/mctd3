@@ -85,6 +85,10 @@ std::string Vec2::to_string() {
 
 // TextureType
 
+TextureType::TextureType() {
+	setScale(Vec2(1, 1));
+}
+
 TextureType::TextureType(std::string path, Vec2 scale, bool clip) {
 	setClip(clip);
 	setScale(scale);
@@ -283,6 +287,38 @@ EventType::EventType(Frame* caller) {
 	Caller = caller;
 }
 
+void AnimationType::setFrames(std::vector<TextureType*> frames) {
+	Frames = frames;
+}
+
+void AnimationType::setFrame(unsigned int frame) {
+	CurrentFrame = (unsigned int) std::clamp((int) frame, 0, (int) Frames.size());
+}
+
+std::vector<TextureType*> AnimationType::getFrames() {
+	return Frames;
+}
+
+unsigned int AnimationType::getFrame() {
+	return CurrentFrame;
+}
+
+void AnimationType::nextFrame() {
+	if (CurrentFrame < Frames.size()) {
+		CurrentFrame++;
+	} else {
+		CurrentFrame = 0;
+	}
+}
+
+void AnimationType::prevFrame() {
+	if (CurrentFrame > 0) {
+		CurrentFrame--;
+	} else {
+		CurrentFrame = Frames.size();
+	}
+}
+
 // Frame
 
 Frame::Frame() {
@@ -407,6 +443,10 @@ void Frame::setEventCallback(EventEnum enumEvent, EventCallback eventCallback) {
 	EventCallbacks.at((int) enumEvent) = eventCallback;
 }
 
+void Frame::setAnimation(AnimationType* animation) {
+	Animation = animation;
+}
+
 
 void Frame::toggleVisible(bool recursive) {
 	if (Visible) {
@@ -491,6 +531,10 @@ std::set<EventEnum> Frame::getEventTypes() {
 
 std::vector<EventCallback> Frame::getEventCallbacks() {
 	return EventCallbacks;
+}
+
+AnimationType* Frame::getAnimation() {
+	return Animation;
 }
 
 

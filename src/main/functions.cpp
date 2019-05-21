@@ -175,11 +175,11 @@ bool MCTD3_Close() {
 	loggerf("\t" + std::to_string(cleanUpTiles()) + " tile(s) cleaned up.", Level::DEBUG);
 	loggerf("\tCleaning up " + std::to_string(Frames.size()) + " frame(s).", Level::DEBUG);
 	loggerf("\t" + std::to_string(cleanUpFrames()) + " frame(s) cleaned up.", Level::DEBUG);
-	if (window) {
+	if (window != nullptr) {
 		loggerf("\tDestroying window.", Level::DEBUG);
 		SDL_DestroyWindow(window);
 	}
-	if (renderer) {
+	if (renderer != nullptr) {
 		loggerf("\tDestroying renderer.", Level::DEBUG);
 		SDL_DestroyRenderer(renderer);
 	}

@@ -34,8 +34,9 @@ void oreDigCallback(EventType eventType) {
 	if (e.button == 1) {
 		if (eventType.Caller->isPointInBounds(e.x, e.y, true)) {
 			mineCount[eventType.Caller]++;
-			if (mineCount[eventType.Caller] == 8) {
-				label->getText()->setText("You are get diamonde!");
+			eventType.Caller->getAnimation()->nextFrame();
+			if (mineCount[eventType.Caller] == 10) {
+				label->getText()->setText("Good job!");
 				eventType.Caller->setEventCallback(EventEnum::MOUSE_DOWN);
 				eventType.Caller->setVisible(false);
 				std::thread resetThread(setText, defaultLabelText, 5); resetThread.detach();

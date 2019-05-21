@@ -88,9 +88,18 @@ bool MCTD3_InitUI() {
 	Tile* stone8 = new Tile("stone");
 	stone8->setPosition(Vec2(2, 2));
 
+	AnimationType* breakAnim = new AnimationType();
+	std::vector<TextureType*> textures = breakAnim->getFrames();
+	for (int i = 0; i < 10; i++) {
+		textures.push_back(new TextureType("assets/blocks/block_break/" + std::to_string(i) + ".png"));
+	}
+	breakAnim->setFrames(textures);
+
 	for (Tile* tile : Tiles) {
-		tile->getFrame()->setVisible(true);
-		tile->getFrame()->setEventCallback(EventEnum::MOUSE_DOWN, oreDigCallback);
+		Frame* frame = tile->getFrame();
+		frame->setVisible(true);
+		frame->setEventCallback(EventEnum::MOUSE_DOWN, oreDigCallback);
+		frame->setAnimation(breakAnim);
 	}
 
 	label = new Frame();

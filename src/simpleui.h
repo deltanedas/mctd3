@@ -10,6 +10,7 @@
 #include <functional>
 #include <vector>
 #include <type_traits>
+#include <climits>
 #include "logger.h"
 
 /* USER GUIDE
@@ -86,7 +87,7 @@ class Vec2 {
 
 class TextureType {
 	public:
-		TextureType() {}
+		TextureType();
 		TextureType(std::string path, Vec2 scale = Vec2(1.0, 1.0), bool clip = false);
 		~TextureType();
 
@@ -212,6 +213,23 @@ class SizeType {
 		Vec2 Offset;
 };
 
+class AnimationType {
+	public:
+		AnimationType() {}
+
+		void setFrames(std::vector<TextureType*> frames);
+		void setFrame(unsigned int frame);
+
+		std::vector<TextureType*> getFrames();
+		unsigned int getFrame();
+
+		void nextFrame();
+		void prevFrame();
+	private:
+		std::vector<TextureType*> Frames;
+		unsigned int CurrentFrame = 0;
+};
+
 class Frame {
 	public:
 		Frame();
@@ -226,6 +244,7 @@ class Frame {
 		void setTexture(TextureType* texture = NULL);
 		void setText(TextType* text = NULL);
 		void setEventCallback(EventEnum enumEvent, EventCallback eventCallback = NULL);
+		void setAnimation(AnimationType* animation);
 
 		// Getters
 		SizeType getSize();
@@ -241,6 +260,7 @@ class Frame {
 		TextType* getText();
 		std::set<EventEnum> getEventTypes();
 		std::vector<EventCallback> getEventCallbacks();
+		AnimationType* getAnimation();
 
 		// Togglers
 		void toggleVisible(bool recursive = false);
@@ -263,6 +283,7 @@ private:
 	TextType* Text;
 	std::set<EventEnum> EventTypes;
 	std::vector<EventCallback> EventCallbacks;
+	AnimationType* Animation;
 };
 
 
