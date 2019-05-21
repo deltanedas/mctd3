@@ -104,6 +104,10 @@ void TextureType::setPath(std::string path) {
 		if (surface == nullptr) {
 			throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
 		}
+		if (Clip) {
+			SDL_SetClipRect(surface, NULL);
+		}
+
 		Texture = SDL_CreateTextureFromSurface(renderer, surface);
 		SDL_FreeSurface(surface);
 		Path = path;
@@ -521,7 +525,7 @@ int cleanUpFrames() {
 			delete frame->getText();
 		}*/
 		loggerf("\tDeleting frame.", Level::DEBUG);
-		delete frame;
+		//delete frame;
 		ret++;
 	}
 	return ret;

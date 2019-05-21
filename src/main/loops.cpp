@@ -46,6 +46,7 @@ bool MCTD3_RenderLoop() {
 
 			SDL_SetRenderDrawColor(renderer, colour->getR(), colour->getG(), colour->getB(), colour->getA());
 			SDL_RenderFillRect(renderer, rect);
+			delete rect;
 
 			if (frame->getTexture() != nullptr) {
 				SDL_Rect* textureRect = new SDL_Rect();
@@ -62,6 +63,7 @@ bool MCTD3_RenderLoop() {
 				if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
 					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
 				}
+				delete textureRect;
 			}
 
 			if (frame->getText() != nullptr) {
