@@ -213,21 +213,24 @@ class SizeType {
 		Vec2 Offset;
 };
 
+// Known bug:
+// 1. create frames X long
+// 2. switch to last frame
+// 3. set frames to be X - Y long
+// 4. segfault
+// 5. dont modify animations on the go?
+
 class AnimationType {
 	public:
-		AnimationType() {}
+		AnimationType(std::vector<TextureType*> frames = {});
 
-		void setFrames(std::vector<TextureType*> frames);
-		void setFrame(unsigned int frame);
+		//void setFrames(std::vector<TextureType*> frames = {});
 
 		std::vector<TextureType*> getFrames();
-		unsigned int getFrame();
 
-		void nextFrame();
-		void prevFrame();
+		bool operator() ();
 	private:
-		std::vector<TextureType*> Frames;
-		unsigned int CurrentFrame = 0;
+		std::vector<TextureType*> Frames = {};
 };
 
 class Frame {
@@ -245,6 +248,9 @@ class Frame {
 		void setText(TextType* text = NULL);
 		void setEventCallback(EventEnum enumEvent, EventCallback eventCallback = NULL);
 		void setAnimation(AnimationType* animation);
+		void setAnimationFrame(unsigned int frame);
+		void setPivot(Vec2 pivot);
+		void setRotation(int rotation)
 
 		// Getters
 		SizeType getSize();
@@ -261,6 +267,9 @@ class Frame {
 		std::set<EventEnum> getEventTypes();
 		std::vector<EventCallback> getEventCallbacks();
 		AnimationType* getAnimation();
+		unsigned int getAnimationFrame();
+		Vec2 getPivot();
+		int getRotation();
 
 		// Togglers
 		void toggleVisible(bool recursive = false);
@@ -269,6 +278,10 @@ class Frame {
 		// Logic
 		bool isPointInBounds(Vec2 point, bool absolute = false);
 		bool isPointInBounds(int pointX, int pointY, bool absolute = false);
+
+		// Other
+		void nextAnimationFrame();
+		void prevAnimationFrame();
 private:
 	SizeType Size;
 	SizeType Position;
@@ -284,6 +297,9 @@ private:
 	std::set<EventEnum> EventTypes;
 	std::vector<EventCallback> EventCallbacks;
 	AnimationType* Animation;
+	unsigned int CurrentFrame = 0;
+	Vec2 Pivot;
+	int Rotation;
 };
 
 

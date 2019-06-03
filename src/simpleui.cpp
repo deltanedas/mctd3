@@ -287,36 +287,27 @@ EventType::EventType(Frame* caller) {
 	Caller = caller;
 }
 
-void AnimationType::setFrames(std::vector<TextureType*> frames) {
+// AnimationType
+
+AnimationType::AnimationType(std::vector<TextureType*> frames) {
 	Frames = frames;
 }
 
-void AnimationType::setFrame(unsigned int frame) {
-	CurrentFrame = (unsigned int) std::clamp((int) frame, 0, (int) Frames.size());
-}
+// Read header
+/* void AnimationType::setFrames(std::vector<TextureType*> frames) {
+	if (frames) {
+		Frames = {};
+	} else {
+		Frames = frames;
+	}
+} */
 
 std::vector<TextureType*> AnimationType::getFrames() {
 	return Frames;
 }
 
-unsigned int AnimationType::getFrame() {
-	return CurrentFrame;
-}
-
-void AnimationType::nextFrame() {
-	if (CurrentFrame < Frames.size()) {
-		CurrentFrame++;
-	} else {
-		CurrentFrame = 0;
-	}
-}
-
-void AnimationType::prevFrame() {
-	if (CurrentFrame > 0) {
-		CurrentFrame--;
-	} else {
-		CurrentFrame = Frames.size();
-	}
+bool AnimationType::operator() () {
+	return Frames.size() > 0;
 }
 
 // Frame
@@ -447,6 +438,10 @@ void Frame::setAnimation(AnimationType* animation) {
 	Animation = animation;
 }
 
+void Frame::setAnimationFrame(unsigned int frame) {
+	CurrentFrame = (unsigned int) std::clamp((int) frame, 0, (int) Animation->getFrames().size());
+}
+
 
 void Frame::toggleVisible(bool recursive) {
 	if (Visible) {
@@ -478,6 +473,22 @@ bool Frame::isPointInBounds(Vec2 point, bool absolute) {
 
 bool Frame::isPointInBounds(int pointX, int pointY, bool absolute) {
 	return isPointInBounds(Vec2(pointX, pointY), absolute);
+}
+
+void Frame::nextAnimationFrame() {
+	if (CurrentFrame < Animation->getFrames().size()) {
+		CurrentFrame++;
+	} else {
+		CurrentFrame = 0;
+	}
+}
+
+void Frame::prevAnimationFrame() {
+	if (CurrentFrame > 0) {
+		CurrentFrame--;
+	} else {
+		CurrentFrame = Animation->getFrames().size();
+	}
 }
 
 
@@ -535,6 +546,10 @@ std::vector<EventCallback> Frame::getEventCallbacks() {
 
 AnimationType* Frame::getAnimation() {
 	return Animation;
+}
+
+unsigned int Frame::getAnimationFrame() {
+	return CurrentFrame;
 }
 
 

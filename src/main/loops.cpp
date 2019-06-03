@@ -33,37 +33,43 @@ bool MCTD3_RenderLoop() {
 			Vec2 size = frame->getAbsoluteSize();
 			Vec2 pos = frame->getAbsolutePosition();
 			ColourType* colour = frame->getColour();
+			int rotation = frame->getRotation();
+			Vec2 pivot = frame->getPivot();
 			if (!frame->getAnchored()) {
 				pos -= Vec2(camera.X, camera.Y);
 			}
-			SDL_Rect* rect = new SDL_Rect();
 			if (size.X < 1) size.X = 1;
 			if (size.Y < 1) size.Y = 1;
-			rect->x = pos.X;
-			rect->y = pos.Y;
-			rect->w = size.X;
-			rect->h = size.Y;
+			if (colour->getA() > 0) {
+				SDL_Rect* rect = new SDL_Rect();
+				rect->x = pos.X;
+				rect->y = pos.Y;
+				rect->w = size.X;
+				rect->h = size.Y;
 
-			SDL_SetRenderDrawColor(renderer, colour->getR(), colour->getG(), colour->getB(), colour->getA());
-			SDL_RenderFillRect(renderer, rect);
-			delete rect;
+				SDL_SetRenderDrawColor(renderer, colour->getR(), colour->getG(), colour->getB(), colour->getA());
+				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, rect, rotation, pivot) != 0) {
+					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
+				}
+				delete rect;
+			}
 
 			if (frame->getTexture() != nullptr) {
-			SDL_Rect* textureRect = new SDL_Rect();
-			TextureType* texture = frame->getTexture();
-			size.X *= texture->getScale().X;
-			size.Y *= texture->getScale().Y;
-			if (size.X < 1) size.X = 1;
-			if (size.Y < 1) size.Y = 1;
-			textureRect->x = pos.X;
-			textureRect->y = pos.Y;
-			textureRect->w = size.X;
-			textureRect->h = size.Y;
-			SDL_ClearError();
-			if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
-				loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
-			}
-			delete textureRect;
+				SDL_Rect* textureRect = new SDL_Rect();
+				TextureType* texture = frame->getTexture();
+				size.X *= texture->getScale().X;
+				size.Y *= texture->getScale().Y;
+				if (size.X < 1) size.X = 1;
+				if (size.Y < 1) size.Y = 1;
+				textureRect->x = pos.X;
+				textureRect->y = pos.Y;
+				textureRect->w = size.X;
+				textureRect->h = size.Y;
+				SDL_ClearError();
+				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot) != 0) {
+					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
+				}
+				delete textureRect;
 			}
 
 			if (frame->getText() != nullptr) {
@@ -86,32 +92,27 @@ bool MCTD3_RenderLoop() {
 				}
 			}
 
-			if (frame->getAnimation() != nullptr) {
-				loggerf("hmm");
-				AnimationType* anim = frame->getAnimation();
-				loggerf("yes");
-				loggerf(anim != nullptr);
-				loggerf("nope");
-				if (anim->getFrames().size() > 0) {
-					loggerf("aha!");
-					TextureType* texture = anim->getFrames()[anim->getFrame()];
-					if (texture != nullptr) {
-						loggerf("john");
-						SDL_Rect* textureRect = new SDL_Rect();
-						size.X *= texture->getScale().X;
-						size.Y *= texture->getScale().Y;
-						if (size.X < 1) size.X = 1;
-						if (size.Y < 1) size.Y = 1;
-						textureRect->x = pos.X;
-						textureRect->y = pos.Y;
-						textureRect->w = size.X;
-						textureRect->h = size.Y;
-						SDL_ClearError();
-						if (SDL_RenderCopy(renderer, texture->getTexture(), NULL, textureRect) != 0) {
-							loggerf("Failed to render animation: " + std::string(SDL_GetError()), Level::WARN);
-						}
-						delete textureRect;
+			loggerf("Yeet");
+			if (frame->getAnimation()) {
+				loggerf("anim");
+				TextureType* texture = frame->getAnimation()->getFrames()[frame->getAnimationFrame()];
+				loggerf("yeah i was askin for it wasnt i");
+				if (texture != nullptr) {
+					loggerf("Yeet?");
+					SDL_Rect* textureRect = new SDL_Rect();
+					size.X *= texture->getScale().X;
+					size.Y *= texture->getScale().Y;
+					if (size.X < 1) size.X = 1;
+					if (size.Y < 1) size.Y = 1;
+					textureRect->x = pos.X;
+					textureRect->y = pos.Y;
+					textureRect->w = size.X;
+					textureRect->h = size.Y;
+					SDL_ClearError();
+					if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect) != 0) {
+						loggerf("Failed to render animation frame: " + std::string(SDL_GetError()), Level::WARN);
 					}
+					delete textureRect;
 				}
 			}
 		}

@@ -87,20 +87,22 @@ bool MCTD3_InitUI() {
 	stone7->setPosition(Vec2(1, 2));
 	Tile* stone8 = new Tile("stone");
 	stone8->setPosition(Vec2(2, 2));
+	loggerf("Break anim start");
 
-	AnimationType* breakAnim = new AnimationType();
-	std::vector<TextureType*> textures = breakAnim->getFrames();
+	std::vector<TextureType*> textures = {};
 	for (int i = 0; i < 10; i++) {
 		textures.push_back(new TextureType("assets/blocks/block_break/" + std::to_string(i) + ".png"));
 	}
-	breakAnim->setFrames(textures);
+	AnimationType* breakAnim = new AnimationType(textures);
 
+	loggerf("Ali-A");
 	for (Tile* tile : Tiles) {
 		Frame* frame = tile->getFrame();
 		frame->setVisible(true);
 		frame->setEventCallback(EventEnum::MOUSE_DOWN, oreDigCallback);
 		frame->setAnimation(breakAnim);
 	}
+	loggerf("broken");
 
 	label = new Frame();
 		SizeType labelSize;
