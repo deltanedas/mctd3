@@ -41,8 +41,8 @@ bool MCTD3_LoadOptions() {
 					loggerf("Window height must be greater than 0.", Level::WARN);
 				}
 			} else if (option == "fullscreen") {
-				MCTD3_fullscreen = (value == 1 ? 1 : 0);
-				options["fullscreen"] = MCTD3_fullscreen;
+				SimpleUI_fullscreen = (value == 1 ? 1 : 0);
+				options["fullscreen"] = SimpleUI_fullscreen;
 			} else if (option == "key_toggleFullscreen") {
 				options["key_toggleFullscreen"] = value;
 				key_toggleFullscreen = value;

@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 		for (int i = 1; i < argc; i++) {
 			std::string param = std::string(argv[i]);
 			if ((param.compare("-d") == 0) || (param.compare("--debug") == 0)) {
-				MCTD3_debug = true;
+				SimpleUI_debug = true;
 				continue;
 			}
 			if ((param.compare("-h") == 0) || (param.compare("--help") == 0)) {

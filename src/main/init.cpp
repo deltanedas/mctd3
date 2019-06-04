@@ -4,7 +4,7 @@ bool MCTD3_InitSDL() {
 	loggerf("Initialising SDL.", Level::DEBUG);
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		if (SDL_CreateWindowAndRenderer(windowSize.X, windowSize.Y, SDL_WINDOW_RESIZABLE, &window, &renderer) == 0) {
-			if (MCTD3_fullscreen) {
+			if (SimpleUI_fullscreen) {
 				loggerf("Entering fullscreen.", Level::DEBUG);
 				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 			}
@@ -90,7 +90,7 @@ bool MCTD3_InitUI() {
 	loggerf("Break anim start");
 
 	std::vector<TextureType*> textures = {};
-	textures.push_back(new TextureType()));
+	textures.push_back(new TextureType());
 	for (int i = 0; i < 10; i++) {
 		textures.push_back(new TextureType("assets/blocks/block_break/" + std::to_string(i) + ".png"));
 	}
@@ -116,7 +116,10 @@ bool MCTD3_InitUI() {
 		labelText->setScaleX(true);
 		labelText->setScaleY(true);
 	label->setText(labelText);
-		TextureType* labelTexture = new ColourType(128, 255, 128, 128);
+		TextureType* labelTexture = new TextureType();
+		ColourType* labelColour = new ColourType(128, 255, 128, 128);
+		labelTexture->setColour(labelColour);
+	label->setTexture(labelTexture);
 	label->setVisible(true);
 
 	loggerf("UI initialised.");

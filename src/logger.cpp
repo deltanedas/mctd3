@@ -25,7 +25,7 @@ void loggerf(std::string str, Level level) {
 	const char* text = str.c_str();
 	switch (level) {
 		case Level::DEBUG:
-			if (MCTD3_debug) {
+			if (SimpleUI_debug) {
 				printf("[%sDEBUG%s] [%stick #%d%s] [%s%s%s]: %s\n",
 					Colours[GREEN], Colours[RESET],
 					Colours[MAGENTA], tickCount, Colours[RESET],

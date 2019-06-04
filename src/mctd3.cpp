@@ -34,15 +34,8 @@ void updateTilePositions() {
 int cleanUpTiles() {
 	int ret = 0;
 	for (Tile* tile : Tiles) {
-		loggerf("\tCleaning up tile.", Level::DEBUG);
 		delete tile;
-		loggerf("\tCleaning up tile's frame.", Level::DEBUG);
-		cleanUpFrame(tile->getFrame());
 		ret++;
-	}
-
-	for (auto const &it : TileTextures) {
-		delete it.second;
 	}
 	return ret;
 }

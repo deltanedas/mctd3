@@ -5,7 +5,7 @@ bool MCTD3_EventLoop() {
 
 	MCTD3_EventLoop_running = true;
 
-	while (!MCTD3_closing) {
+	while (!SimpleUI_closing) {
 		MCTD3_RawTick();
 		lastTime = SDL_GetTicks();
 		MCTD3_ProcessEvents();
@@ -23,18 +23,18 @@ bool MCTD3_RenderLoop() {
 
 	MCTD3_RenderLoop_running = true;
 
-	while (!MCTD3_closing) {
+	while (!SimpleUI_closing) {
 		MCTD3_Tick();
 		tickCount++;
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 50, 255);
 		SDL_RenderClear(renderer);
-		for (Frame* frame : VisibleFramesInstances) {
+		for (Frame* frame : VisibleFrameInstances) {
 			Vec2 size = frame->getAbsoluteSize();
 			Vec2 pos = frame->getAbsolutePosition();
-			ColourType* colour = frame->getColour();
-			int rotation = frame->getRotation();
-			Vec2 pivot = frame->getPivot();
+			double rotation = frame->getRotation();
+			SDL_Point pivot_p = {(int) frame->getPivot().X, (int) frame->getPivot().Y};
+			const SDL_Point* pivot = const_cast<SDL_Point*>(&pivot_p);
 			if (!frame->getAnchored()) {
 				pos -= Vec2(camera.X, camera.Y);
 			}
@@ -53,7 +53,7 @@ bool MCTD3_RenderLoop() {
 				textureRect->w = size.X;
 				textureRect->h = size.Y;
 				SDL_ClearError();
-				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot) != 0) {
+				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot, SDL_FLIP_NONE) != 0) {
 					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
 				}
 				delete textureRect;
@@ -96,12 +96,13 @@ bool MCTD3_RenderLoop() {
 					textureRect->w = size.X;
 					textureRect->h = size.Y;
 					SDL_ClearError();
-					if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect) != 0) {
+					if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot, SDL_FLIP_NONE) != 0) {
 						loggerf("Failed to render animation frame: " + std::string(SDL_GetError()), Level::WARN);
 					}
 					delete textureRect;
 				}
 			}
+			delete pivot;
 		}
 
 		SDL_RenderPresent(renderer);
@@ -120,7 +121,7 @@ bool MCTD3_LogicLoop() {
 
 	srand(time(0));
 	int counter = 0;
-	while (!MCTD3_closing) {
+	while (!SimpleUI_closing) {
 		MCTD3_Tick();
 		if (RandomInt(1, 600) == 69) {
 			counter++;

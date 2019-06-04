@@ -87,7 +87,7 @@ std::string Vec2::to_string() {
 
 TextureType::TextureType() {
 	setScale(Vec2(1, 1));
-	setColour(new ColourType(255, 255, 255))
+	setColour(new ColourType(255, 255, 255));
 	TextureInstances.insert(this);
 }
 
@@ -106,15 +106,21 @@ TextureType::~TextureType() {
 }
 
 void TextureType::setPath(std::string path) {
+	SDL_Surface* surface;
 	if (path.empty()) { //Empty, use Colour.
 		SDL_ClearError();
-		SDL_
+		Texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, 1, 1);
+
+		SDL_SetTextureColorMod(Texture, Colour->getR(), Colour->getG(), Colour->getB());
+		SDL_SetTextureAlphaMod(Texture, Colour->getA());
+		Path = "";
 	} else {
 		SDL_ClearError();
-		SDL_Surface* surface = IMG_Load(path.c_str());
+		surface = IMG_Load(path.c_str());
 		if (surface == nullptr) {
 			throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
 		}
+
 		if (Clip) {
 			SDL_SetClipRect(surface, NULL);
 		}
@@ -134,6 +140,11 @@ void TextureType::setScale(Vec2 scale) {
 
 void TextureType::setClip(bool clip) {
 	Clip = clip;
+	setPath(Path);
+}
+
+void TextureType::setColour(ColourType* colour) {
+	Colour = colour;
 	setPath(Path);
 }
 
@@ -338,7 +349,7 @@ Frame::Frame() {
 	Texture = NULL;
 	Text = NULL;
 	//Children = {};
-	Frames.insert(this);
+	FrameInstances.insert(this);
 	EventCallbacks.resize(10);
 }
 
@@ -403,9 +414,9 @@ void Frame::setPosition(SizeType position) {
 void Frame::setVisible(bool visible, bool recursive) {
 	Visible = visible;
 	if (visible) {
-		VisibleFrames.insert(this);
+		VisibleFrameInstances.insert(this);
 	} else {
-		VisibleFrames.erase(this);
+		VisibleFrameInstances.erase(this);
 	}
 	setParent(Parent);
 	if (recursive) {
@@ -457,6 +468,14 @@ void Frame::setAnimation(AnimationType* animation) {
 
 void Frame::setAnimationFrame(unsigned int frame) {
 	CurrentFrame = (unsigned int) std::clamp((int) frame, 0, (int) Animation->getFrames().size());
+}
+
+void Frame::setPivot(Vec2 pivot) {
+	Pivot = pivot;
+}
+
+void Frame::setRotation(double rotation) {
+	Rotation = rotation;
 }
 
 
@@ -565,6 +584,14 @@ unsigned int Frame::getAnimationFrame() {
 	return CurrentFrame;
 }
 
+Vec2 Frame::getPivot() {
+	return Pivot;
+}
+
+double Frame::getRotation() {
+	return Rotation;
+}
+
 
 void cleanUpFrame(Frame* frame) {
 	if (frame) {
@@ -574,35 +601,72 @@ void cleanUpFrame(Frame* frame) {
 		}
 	}
 	loggerf("\tRemoving frame from sets.", Level::DEBUG);
-	VisibleFrames.erase(frame);
-	Frames.erase(frame);
+	VisibleFrameInstances.erase(frame);
+	FrameInstances.erase(frame);
 }
 
-int cleanUpFrames() {
+int cleanUpTexts() {
 	int ret = 0;
-	std::set<Frame*> frames = Frames;
-	for (Frame* frame : frames) {
-		loggerf("\tCleaning up frame children.", Level::DEBUG);
-		cleanUpFrame(frame);
-		/*
-		loggerf("\tCleaning up frame texture.", Level::DEBUG);
-		if (frame->getTexture()) {
-			delete frame->getTexture();
-		}
-		loggerf("\tCleaning up frame text.", Level::DEBUG);
-		if (frame->getText()) {
-			delete frame->getText();
-		}*/
-		loggerf("\tDeleting frame.", Level::DEBUG);
-		//delete frame;
+	std::set<TextType*> texts = TextInstances;
+	for (TextType* text : texts) {
+		delete text;
 		ret++;
 	}
 	return ret;
 }
 
+int cleanUpColours() {
+	int ret = 0;
+	std::set<ColourType*> colours = ColourInstances;
+	for (ColourType* colour : colours) {
+		delete colour;
+		ret++;
+	}
+	return ret;
+}
+
+int cleanUpTextures() {
+	int ret = 0;
+	std::set<TextureType*> textures = TextureInstances;
+	for (TextureType* texture : textures) {
+		delete texture;
+		ret++;
+	}
+	return ret;
+}
+
+int cleanUpAnimations() {
+	int ret = 0;
+	std::set<AnimationType*> animations = AnimationInstances;
+	for (AnimationType* animation : animations) {
+		delete animation;
+		ret++;
+	}
+	return ret;
+}
+
+int cleanUpFrames() {
+	int ret = 0;
+	std::set<Frame*> frames = FrameInstances;
+	for (Frame* frame : frames) {
+		cleanUpFrame(frame);
+		delete frame;
+		ret++;
+	}
+	return ret;
+}
+
+void cleanUpSimpleUI() {
+	loggerf("\t" + std::to_string(cleanUpTexts()) + " text(s) cleaned up.", Level::DEBUG);
+	loggerf("\t" + std::to_string(cleanUpColours()) + " colour(s) cleaned up.", Level::DEBUG);
+	loggerf("\t" + std::to_string(cleanUpTextures()) + " texture(s) cleaned up.", Level::DEBUG);
+	loggerf("\t" + std::to_string(cleanUpAnimations()) + " animation(s) cleaned up.", Level::DEBUG);
+	loggerf("\t" + std::to_string(cleanUpFrames()) + " frame(s) cleaned up.", Level::DEBUG);
+}
+
 int updateFrames() {
 	int ret = 0;
-	for (Frame* frame : Reverse(VisibleFrames)) {
+	for (Frame* frame : Reverse(VisibleFrameInstances)) {
 		frame->setParent(frame->getParent());
 		ret++;
 	}
@@ -617,7 +681,7 @@ void updateEvents() {
 			mousePressed = true;
 			break;
 		case SDL_MOUSEBUTTONUP:
-			for (Frame* frame : VisibleFrames) {
+			for (Frame* frame : VisibleFrameInstances) {
 				if (mousePressed) {
 					EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::MOUSE_CLICK];
 					if (callback != NULL) {
@@ -630,7 +694,7 @@ void updateEvents() {
 			mousePressed = false;
 			break;
 		case SDL_MOUSEMOTION:
-			for (Frame* frame : VisibleFrames) {
+			for (Frame* frame : VisibleFrameInstances) {
 				EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::MOUSE_MOVED];
 				if (callback != NULL) {
 					EventType callbackEvent(frame);
@@ -640,7 +704,7 @@ void updateEvents() {
 			}
 			break;
 		case SDL_KEYDOWN:
-			for (Frame* frame : VisibleFrames) {
+			for (Frame* frame : VisibleFrameInstances) {
 				EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::KEY_DOWN];
 				if (callback != NULL && event.key.repeat == 0) {
 					EventType callbackEvent(frame);
@@ -650,7 +714,7 @@ void updateEvents() {
 			}
 			break;
 		case SDL_KEYUP:
-			for (Frame* frame : VisibleFrames) {
+			for (Frame* frame : VisibleFrameInstances) {
 				EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::KEY_UP];
 				if (callback != NULL && event.key.repeat == 0) {
 					EventType callbackEvent(frame);
@@ -660,7 +724,7 @@ void updateEvents() {
 			}
 			break;
 		/*case SDL_MOUSEWHEEL:
-			for (Frame* frame : VisibleFrames) {
+			for (Frame* frame : VisibleFrameInstances) {
 				EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::SCROLL];
 				if (callback != NULL) {
 					EventType callbackEvent(frame);
@@ -670,7 +734,7 @@ void updateEvents() {
 			}
 			break;*/
 	}
-	for (Frame* frame : VisibleFrames) {
+	for (Frame* frame : VisibleFrameInstances) {
 		if (mousePressed) {
 			EventCallback callback = frame->getEventCallbacks()[(int) EventEnum::MOUSE_DOWN];
 			if (callback != NULL) {
@@ -691,8 +755,8 @@ void updateEvents() {
 
 std::set<Frame*> FrameInstances;
 std::set<Frame*> VisibleFrameInstances;
-std::set<TextType*> Instances;
-std::set<ColourType*> TextureInstances;
+std::set<TextType*> TextInstances;
+std::set<ColourType*> ColourInstances;
 std::set<TextureType*> TextureInstances;
 std::set<AnimationType*> AnimationInstances;
 
@@ -701,11 +765,11 @@ SDL_Renderer* renderer = nullptr;
 SDL_Surface* screenSurface = nullptr;
 SDL_Event event;
 
-bool MCTD3_closing = false;
-bool MCTD3_restarting = false;
-bool MCTD3_paused = false;
-bool MCTD3_debug = false;
-bool MCTD3_fullscreen = false;
+bool SimpleUI_closing = false;
+bool SimpleUI_restarting = false;
+bool SimpleUI_paused = false;
+bool SimpleUI_debug = false;
+bool SimpleUI_fullscreen = false;
 
 Vec2 screenSize;
 double aspectRatio;

@@ -85,54 +85,57 @@ class Vec2 {
 		double Y;
 };
 
+class ColourType {
+public:
+	ColourType() {}
+	ColourType(int r, int g, int b, int a = 255);
+	
+	// Setters
+	void setR(int r);
+	void setG(int g);
+	void setB(int b);
+	void setA(int a);
+	
+	// Getters
+	int getR();
+	int getG();
+	int getB();
+	int getA();
+	
+	// Transforming
+	void invert(bool invertAlpha = false);
+	void greyScale();
+private:
+	int R;
+	int G;
+	int B;
+	int A;
+};
+
 class TextureType {
 	public:
 		TextureType();
-		TextureType(std::string path, Vec2 scale = Vec2(1.0, 1.0), bool clip = false);
+		TextureType(std::string path, Vec2 scale = Vec2(1.0, 1.0), bool clip = false, ColourType* colour = new ColourType(255, 255, 255));
 		~TextureType();
 
 		// Setters
 		void setPath(std::string path);
 		void setScale(Vec2 scale);
 		void setClip(bool clip);
+		void setColour(ColourType* colour);
 
 		// Getters
 		SDL_Texture* getTexture();
 		std::string getPath();
 		Vec2 getScale();
 		bool getClip();
+		ColourType* getColour();
 	private:
 		SDL_Texture* Texture;
 		std::string Path;
 		Vec2 Scale;
 		bool Clip;
-};
-
-class ColourType {
-	public:
-		ColourType() {}
-		ColourType(int r, int g, int b, int a = 255);
-
-		// Setters
-		void setR(int r);
-		void setG(int g);
-		void setB(int b);
-		void setA(int a);
-
-		// Getters
-		int getR();
-		int getG();
-		int getB();
-		int getA();
-
-		// Transforming
-		void invert(bool invertAlpha = false);
-		void greyScale();
-	private:
-		int R;
-		int G;
-		int B;
-		int A;
+		ColourType* Colour;
 };
 
 enum class EventEnum {
@@ -249,7 +252,7 @@ class Frame {
 		void setAnimation(AnimationType* animation);
 		void setAnimationFrame(unsigned int frame);
 		void setPivot(Vec2 pivot);
-		void setRotation(int rotation);
+		void setRotation(double rotation);
 
 		// Getters
 		SizeType getSize();
@@ -267,7 +270,7 @@ class Frame {
 		AnimationType* getAnimation();
 		unsigned int getAnimationFrame();
 		Vec2 getPivot();
-		int getRotation();
+		double getRotation();
 
 		// Togglers
 		void toggleVisible(bool recursive = false);
@@ -301,7 +304,14 @@ private:
 
 
 void cleanUpFrame(Frame* frame);
+
+int cleanUpTexts();
+int cleanUpColours();
+int cleanUpTextures();
+int cleanUpAnimations();
 int cleanUpFrames();
+
+void cleanUpSimpleUI();
 
 int updateFrames();
 void updateEvents();
@@ -319,11 +329,11 @@ extern SDL_Renderer* renderer;
 extern SDL_Surface* screenSurface;
 extern SDL_Event event;
 
-extern bool MCTD3_closing;
-extern bool MCTD3_restarting;
-extern bool MCTD3_paused;
-extern bool MCTD3_debug;
-extern bool MCTD3_fullscreen;
+extern bool SimpleUI_closing;
+extern bool SimpleUI_restarting;
+extern bool SimpleUI_paused;
+extern bool SimpleUI_debug;
+extern bool SimpleUI_fullscreen;
 
 extern Vec2 screenSize;
 extern double aspectRatio;
