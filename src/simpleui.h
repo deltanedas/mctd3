@@ -162,7 +162,7 @@ public:
 
 class TextType {
 	public:
-		TextType() {}
+		TextType();
 		TextType(FC_Font* font, std::string text = "");
 		~TextType();
 
@@ -200,7 +200,7 @@ class TextType {
 
 class SizeType {
 	public:
-		SizeType() {}
+		SizeType();
 		SizeType(Vec2 scale, Vec2 offset);
 
 		void setScale(Vec2 scale);
@@ -242,7 +242,6 @@ class Frame {
 		void setPosition(SizeType position);
 		void setVisible(bool visible = true, bool recursive = false);
 		void setAnchored(bool anchored = true, bool recursive = false);
-		void setColour(ColourType* colour = NULL);
 		void setParent(Frame* parent = NULL);
 		void setTexture(TextureType* texture = NULL);
 		void setText(TextType* text = NULL);
@@ -250,7 +249,7 @@ class Frame {
 		void setAnimation(AnimationType* animation);
 		void setAnimationFrame(unsigned int frame);
 		void setPivot(Vec2 pivot);
-		void setRotation(int rotation)
+		void setRotation(int rotation);
 
 		// Getters
 		SizeType getSize();
@@ -259,7 +258,6 @@ class Frame {
 		Vec2 getAbsolutePosition();
 		bool getVisible();
 		bool getAnchored();
-		ColourType* getColour();
 		Frame* getParent();
 		std::set<Frame*> getChildren();
 		TextureType* getTexture();
@@ -289,7 +287,6 @@ private:
 	Vec2 AbsolutePosition;
 	bool Visible = false;
 	bool Anchored = false;
-	ColourType* Colour;
 	Frame* Parent;
 	std::set<Frame*> Children;
 	TextureType* Texture;
@@ -309,8 +306,12 @@ int cleanUpFrames();
 int updateFrames();
 void updateEvents();
 
-extern std::set<Frame*> Frames;
-extern std::set<Frame*> VisibleFrames;
+extern std::set<Frame*> FrameInstances;
+extern std::set<Frame*> VisibleFrameInstances;
+extern std::set<TextType*> TextInstances;
+extern std::set<ColourType*> ColourInstances;
+extern std::set<TextureType*> TextureInstances;
+extern std::set<AnimationType*> AnimationInstances;
 
 
 extern SDL_Window* window;

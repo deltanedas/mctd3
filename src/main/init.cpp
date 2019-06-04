@@ -90,6 +90,7 @@ bool MCTD3_InitUI() {
 	loggerf("Break anim start");
 
 	std::vector<TextureType*> textures = {};
+	textures.push_back(new TextureType()));
 	for (int i = 0; i < 10; i++) {
 		textures.push_back(new TextureType("assets/blocks/block_break/" + std::to_string(i) + ".png"));
 	}
@@ -115,8 +116,7 @@ bool MCTD3_InitUI() {
 		labelText->setScaleX(true);
 		labelText->setScaleY(true);
 	label->setText(labelText);
-		ColourType* labelColour = new ColourType(128, 255, 128, 128);
-	label->setColour(labelColour);
+		TextureType* labelTexture = new ColourType(128, 255, 128, 128);
 	label->setVisible(true);
 
 	loggerf("UI initialised.");

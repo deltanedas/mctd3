@@ -29,7 +29,7 @@ bool MCTD3_RenderLoop() {
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 50, 255);
 		SDL_RenderClear(renderer);
-		for (Frame* frame : VisibleFrames) {
+		for (Frame* frame : VisibleFramesInstances) {
 			Vec2 size = frame->getAbsoluteSize();
 			Vec2 pos = frame->getAbsolutePosition();
 			ColourType* colour = frame->getColour();
@@ -40,19 +40,6 @@ bool MCTD3_RenderLoop() {
 			}
 			if (size.X < 1) size.X = 1;
 			if (size.Y < 1) size.Y = 1;
-			if (colour->getA() > 0) {
-				SDL_Rect* rect = new SDL_Rect();
-				rect->x = pos.X;
-				rect->y = pos.Y;
-				rect->w = size.X;
-				rect->h = size.Y;
-
-				SDL_SetRenderDrawColor(renderer, colour->getR(), colour->getG(), colour->getB(), colour->getA());
-				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, rect, rotation, pivot) != 0) {
-					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
-				}
-				delete rect;
-			}
 
 			if (frame->getTexture() != nullptr) {
 				SDL_Rect* textureRect = new SDL_Rect();

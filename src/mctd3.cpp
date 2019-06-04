@@ -57,7 +57,6 @@ Tile::Tile(std::string id) {
 	} else {
 		loggerf("Texture '" + id + "' not found.", Level::WARN);
 	}
-	frame->setColour(&blankColour);
 	frame->setParent();
 	Tiles.insert(this);
 }

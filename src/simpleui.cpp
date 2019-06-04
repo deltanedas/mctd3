@@ -87,12 +87,16 @@ std::string Vec2::to_string() {
 
 TextureType::TextureType() {
 	setScale(Vec2(1, 1));
+	setColour(new ColourType(255, 255, 255))
+	TextureInstances.insert(this);
 }
 
-TextureType::TextureType(std::string path, Vec2 scale, bool clip) {
+TextureType::TextureType(std::string path, Vec2 scale, bool clip, ColourType* colour) {
 	setClip(clip);
 	setScale(scale);
 	setPath(path);
+	setColour(colour);
+	TextureInstances.insert(this);
 }
 
 TextureType::~TextureType() {
@@ -102,7 +106,10 @@ TextureType::~TextureType() {
 }
 
 void TextureType::setPath(std::string path) {
-	if (!path.empty()) {
+	if (path.empty()) { //Empty, use Colour.
+		SDL_ClearError();
+		SDL_
+	} else {
 		SDL_ClearError();
 		SDL_Surface* surface = IMG_Load(path.c_str());
 		if (surface == nullptr) {
@@ -146,11 +153,20 @@ bool TextureType::getClip() {
 	return Clip;
 }
 
+ColourType* TextureType::getColour() {
+	return Colour;
+}
+
 // TextType
+
+TextType::TextType() {
+	TextInstances.insert(this);
+}
 
 TextType::TextType(FC_Font* font, std::string text) {
 	setFont(font);
 	setText(text);
+	TextInstances.insert(this);
 }
 
 TextType::~TextType() {
@@ -227,6 +243,11 @@ Vec2 TextType::getSize() {
 }
 
 // SizeType
+
+SizeType::SizeType() {
+	setScale(Vec2(1, 1));
+	setOffset(Vec2(0, 0));
+}
 
 SizeType::SizeType(Vec2 scale, Vec2 offset) {
 	setScale(scale);
@@ -403,10 +424,6 @@ void Frame::setAnchored(bool anchored, bool recursive) {
 	}
 }
 
-void Frame::setColour(ColourType* colour) {
-	Colour = colour;
-}
-
 void Frame::setParent(Frame* parent) {
 	if (parent == this) {
 		throw std::runtime_error("Frame cannot be its own parent.");
@@ -516,10 +533,6 @@ bool Frame::getAnchored() {
 	return Anchored;
 }
 
-ColourType* Frame::getColour() {
-	return Colour;
-}
-
 Frame* Frame::getParent() {
 	return Parent;
 }
@@ -571,10 +584,7 @@ int cleanUpFrames() {
 	for (Frame* frame : frames) {
 		loggerf("\tCleaning up frame children.", Level::DEBUG);
 		cleanUpFrame(frame);
-		/*loggerf("\tCleaning up frame colour.", Level::DEBUG);
-		if (frame->getColour()) {
-			delete frame->getColour();
-		}
+		/*
 		loggerf("\tCleaning up frame texture.", Level::DEBUG);
 		if (frame->getTexture()) {
 			delete frame->getTexture();
@@ -679,8 +689,12 @@ void updateEvents() {
 	}
 }
 
-std::set<Frame*> Frames;
-std::set<Frame*> VisibleFrames;
+std::set<Frame*> FrameInstances;
+std::set<Frame*> VisibleFrameInstances;
+std::set<TextType*> Instances;
+std::set<ColourType*> TextureInstances;
+std::set<TextureType*> TextureInstances;
+std::set<AnimationType*> AnimationInstances;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
