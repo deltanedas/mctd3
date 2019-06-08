@@ -285,7 +285,7 @@ ColourType::ColourType(int r, int g, int b, int a) {
 	setG(g);
 	setB(b);
 	setA(a);
-	ColourInstances.insert(this);
+	//ColourInstances.insert(this); //Segfaults, no fukin idea why
 }
 
 void ColourType::setR(int r) { R = clamp8Bit(r); }

@@ -98,7 +98,6 @@ bool MCTD3_RenderLoop() {
 					delete textureRect;
 				}
 			}
-			delete pivot;
 		}
 
 		SDL_RenderPresent(renderer);
