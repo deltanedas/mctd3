@@ -79,13 +79,9 @@ bool MCTD3_RenderLoop() {
 				}
 			}
 
-			loggerf("Yeet");
 			if (frame->getAnimation()) {
-				loggerf("anim");
 				TextureType* texture = frame->getAnimation()->getFrames()[frame->getAnimationFrame()];
-				loggerf("yeah i was askin for it wasnt i");
 				if (texture != nullptr) {
-					loggerf("Yeet?");
 					SDL_Rect* textureRect = new SDL_Rect();
 					size.X *= texture->getScale().X;
 					size.Y *= texture->getScale().Y;

@@ -86,16 +86,16 @@ std::string Vec2::to_string() {
 // TextureType
 
 TextureType::TextureType() {
-	setScale(Vec2(1, 1));
 	setColour(new ColourType(255, 255, 255));
+	setScale(Vec2(1, 1));
 	TextureInstances.insert(this);
 }
 
 TextureType::TextureType(std::string path, Vec2 scale, bool clip, ColourType* colour) {
+	setColour(colour);
 	setClip(clip);
 	setScale(scale);
 	setPath(path);
-	setColour(colour);
 	TextureInstances.insert(this);
 }
 
@@ -115,6 +115,7 @@ void TextureType::setPath(std::string path) {
 		SDL_SetTextureAlphaMod(Texture, Colour->getA());
 		Path = "";
 	} else {
+		loggerf("Loading path: " + path, Level::DEBUG);
 		SDL_ClearError();
 		surface = IMG_Load(path.c_str());
 		if (surface == nullptr) {
@@ -284,6 +285,7 @@ ColourType::ColourType(int r, int g, int b, int a) {
 	setG(g);
 	setB(b);
 	setA(a);
+	ColourInstances.insert(this);
 }
 
 void ColourType::setR(int r) { R = clamp8Bit(r); }
@@ -755,10 +757,10 @@ void updateEvents() {
 
 std::set<Frame*> FrameInstances;
 std::set<Frame*> VisibleFrameInstances;
-std::set<TextType*> TextInstances;
-std::set<ColourType*> ColourInstances;
-std::set<TextureType*> TextureInstances;
-std::set<AnimationType*> AnimationInstances;
+std::set<TextType*> TextInstances = {};
+std::set<ColourType*> ColourInstances = {};
+std::set<TextureType*> TextureInstances = {};
+std::set<AnimationType*> AnimationInstances = {};
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;

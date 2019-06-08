@@ -14,7 +14,6 @@ int cleanUpTiles();
 class Tile {
 	public:
 		Tile(std::string id = "dirt");
-		~Tile();
 
 		void setID(std::string id);
 		void setPosition(Vec2 position);

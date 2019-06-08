@@ -2,7 +2,7 @@ BUILDDIR = build
 SOURCEDIR = src
 
 CXX = g++-8
-CXXFLAGS = -O3 -Wall -std=c++17 -I$(SOURCEDIR) -c -g
+CXXFLAGS = -O3 -Wall -ansi -pedantic -std=c++17 -I$(SOURCEDIR) -c -g
 LDFLAGS = -L. -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread -lstdc++fs -Wl,-rpath,'$$ORIGIN',--Bstatic -lSDL2_fontcache -Wl,-Bdynamic
 
 EXEC_FILE = MCTD3
@@ -18,7 +18,7 @@ debug: $(EXEC_FILE)
 	./$(EXEC_FILE) -d
 
 valgrind: $(EXEC_FILE)
-	valgrind --track-origins=yes ./$(EXEC_FILE) -d
+	valgrind --track-origins=yes --leak-check=full ./$(EXEC_FILE) -d
 
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.cpp
 	mkdir -p $(BUILDDIR)

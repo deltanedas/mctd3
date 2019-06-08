@@ -54,10 +54,6 @@ Tile::Tile(std::string id) {
 	Tiles.insert(this);
 }
 
-Tile::~Tile() {
-	delete frame;
-}
-
 void Tile::setID(std::string id) {
 	frame->setTexture(TileTextures[id]);
 	ID = id;
