@@ -20,11 +20,12 @@
  * 3. glhf
  *
  * - look at my example (NOT EXEMPLARY BY ANY MEANS) code if youre stuck
- * - -lSDL2 -lSDL2_image -lSDL2_ttf -l SDL2_fontcache -lpthread
+ * - -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_fontcache -lSDL2_gfx -lSDL2_mixer -lpthread
  * - use them for linking
  * - i highly recommend splitting your loops for input, logic, rendering and something else into different threads.
  * - when in doubt, THING != NULL
  */
+
 class Frame;
 class EventType;
 typedef void (*EventCallback)(EventType);
@@ -97,6 +98,7 @@ public:
 	void setA(int a);
 	
 	// Getters
+	std::string to_string();
 	int getR();
 	int getG();
 	int getB();
@@ -297,7 +299,7 @@ private:
 	std::set<EventEnum> EventTypes;
 	std::vector<EventCallback> EventCallbacks;
 	AnimationType* Animation;
-	unsigned int CurrentFrame = 0;
+	unsigned int CurrentFrame;
 	Vec2 Pivot;
 	int Rotation;
 };

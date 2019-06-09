@@ -31,6 +31,7 @@ void setText(std::string text, int count) {
 
 void oreDigCallback(EventType eventType) {
 	SDL_MouseButtonEvent e = eventType.MouseButtonEvent;
+	loggerf("Yo ive been clicked.");
 	if (e.button == 1) {
 		if (eventType.Caller->isPointInBounds(e.x, e.y, true)) {
 			mineCount[eventType.Caller]++;

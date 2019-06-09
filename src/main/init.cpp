@@ -68,7 +68,7 @@ bool MCTD3_InitUI() {
 	loggerf("Initialising UI.", Level::DEBUG);
 	initTextures();
 	FC_Font* minecraftFont = FC_CreateFont();
-	SDL_Color color = FC_MakeColor(0, 0, 0, 255);
+	SDL_Color color = FC_MakeColor(0, 255, 0, 255);
 	FC_LoadFont(minecraftFont, renderer, "assets/minecraftia.ttf", 24, color, TTF_STYLE_NORMAL);
 	Tile* stone = new Tile("stone");
 	Tile* stone2 = new Tile("stone");
@@ -87,7 +87,6 @@ bool MCTD3_InitUI() {
 	stone7->setPosition(Vec2(1, 2));
 	Tile* stone8 = new Tile("stone");
 	stone8->setPosition(Vec2(2, 2));
-	loggerf("Break anim start");
 
 	std::vector<TextureType*> textures = {};
 	textures.push_back(new TextureType());

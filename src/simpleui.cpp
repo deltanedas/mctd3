@@ -86,8 +86,10 @@ std::string Vec2::to_string() {
 // TextureType
 
 TextureType::TextureType() {
+	Path = "";
 	setColour(new ColourType(255, 255, 255));
 	setScale(Vec2(1, 1));
+	setPath("");
 	TextureInstances.insert(this);
 }
 
@@ -109,15 +111,21 @@ void TextureType::setPath(std::string path) {
 	SDL_Surface* surface;
 	if (path.empty()) { //Empty, use Colour.
 		SDL_ClearError();
-		Texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, 1, 1);
+		SDL_Surface* Surface = SDL_CreateRGBSurface(0, 10, 10, 32, 0, 0, 0, 0);
 
-		SDL_SetTextureColorMod(Texture, Colour->getR(), Colour->getG(), Colour->getB());
-		SDL_SetTextureAlphaMod(Texture, Colour->getA());
+		if (Surface == nullptr) {
+			throw std::runtime_error("Failed to create surface: " + std::string(SDL_GetError()));
+		}
+
+		Texture = SDL_CreateTextureFromSurface(renderer, Surface);
+
+		SDL_FillRect(Surface, NULL, SDL_MapRGBA(Surface->format, Colour->getR(), Colour->getG(), Colour->getB(), Colour->getA()));
 		Path = "";
 	} else {
 		loggerf("Loading path: " + path, Level::DEBUG);
 		SDL_ClearError();
 		surface = IMG_Load(path.c_str());
+
 		if (surface == nullptr) {
 			throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
 		}
@@ -184,9 +192,6 @@ TextType::TextType(FC_Font* font, std::string text) {
 TextType::~TextType() {
 	if (Font) {
 		FC_FreeFont(Font);
-	}
-	if (Colour) {
-		delete Colour;
 	}
 }
 
@@ -293,6 +298,10 @@ void ColourType::setG(int g) { G = clamp8Bit(g); }
 void ColourType::setB(int b) { B = clamp8Bit(b); }
 void ColourType::setA(int a) { A = clamp8Bit(a); }
 
+std::string ColourType::to_string() {
+	return "R: " + std::to_string(R) + ", G: " + std::to_string(G) + ", B: " + std::to_string(B) + ", A: " + std::to_string(A);
+}
+
 int ColourType::getR() { return R; }
 int ColourType::getG() { return G; }
 int ColourType::getB() { return B; }
@@ -353,6 +362,9 @@ Frame::Frame() {
 	//Children = {};
 	FrameInstances.insert(this);
 	EventCallbacks.resize(10);
+	CurrentFrame = 0;
+	Pivot = Vec2(0, 0);
+	Rotation = 0;
 }
 
 void Frame::setSize(SizeType size) {
@@ -602,7 +614,7 @@ void cleanUpFrame(Frame* frame) {
 			child->setParent();
 		}
 	}
-	loggerf("\tRemoving frame from sets.", Level::DEBUG);
+
 	VisibleFrameInstances.erase(frame);
 	FrameInstances.erase(frame);
 }
