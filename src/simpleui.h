@@ -253,7 +253,7 @@ class Frame {
 		void setEventCallback(EventEnum enumEvent, EventCallback eventCallback = NULL);
 		void setAnimation(AnimationType* animation);
 		void setAnimationFrame(unsigned int frame);
-		void setPivot(Vec2 pivot);
+		void setPivot(SizeType pivot);
 		void setRotation(double rotation);
 
 		// Getters
@@ -271,7 +271,8 @@ class Frame {
 		std::vector<EventCallback> getEventCallbacks();
 		AnimationType* getAnimation();
 		unsigned int getAnimationFrame();
-		Vec2 getPivot();
+		SizeType getPivot();
+		Vec2 getAbsolutePivot();
 		double getRotation();
 
 		// Togglers
@@ -292,16 +293,17 @@ private:
 	Vec2 AbsolutePosition;
 	bool Visible = false;
 	bool Anchored = false;
-	Frame* Parent;
-	std::set<Frame*> Children;
+	Frame* Parent = NULL;
+	std::set<Frame*> Children = {};
 	TextureType* Texture;
 	TextType* Text;
 	std::set<EventEnum> EventTypes;
 	std::vector<EventCallback> EventCallbacks;
 	AnimationType* Animation;
-	unsigned int CurrentFrame;
-	Vec2 Pivot;
-	int Rotation;
+	unsigned int CurrentFrame = 0;
+	SizeType Pivot;
+	Vec2 AbsolutePivot;
+	int Rotation = 0;
 };
 
 
@@ -348,8 +350,7 @@ public:
 	Camera() {}
 	void Move(int x, int y);
 	void Move(double x, double y);
-	double X;
-	double Y;
+	double X, Y;
 };
 
 extern Camera camera;

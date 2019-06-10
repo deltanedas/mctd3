@@ -89,7 +89,6 @@ TextureType::TextureType() {
 	Path = "";
 	setColour(new ColourType(255, 255, 255));
 	setScale(Vec2(1, 1));
-	setPath("");
 	TextureInstances.insert(this);
 }
 
@@ -108,36 +107,35 @@ TextureType::~TextureType() {
 }
 
 void TextureType::setPath(std::string path) {
-	SDL_Surface* surface;
 	if (path.empty()) { //Empty, use Colour.
 		SDL_ClearError();
-		SDL_Surface* Surface = SDL_CreateRGBSurface(0, 10, 10, 32, 0, 0, 0, 0);
+		SDL_Surface* Surface = SDL_CreateRGBSurface(0, 1, 1, 32, 0, 0, 0, 0);
 
 		if (Surface == nullptr) {
 			throw std::runtime_error("Failed to create surface: " + std::string(SDL_GetError()));
 		}
 
 		Texture = SDL_CreateTextureFromSurface(renderer, Surface);
-
 		SDL_FillRect(Surface, NULL, SDL_MapRGBA(Surface->format, Colour->getR(), Colour->getG(), Colour->getB(), Colour->getA()));
-		Path = "";
+		SDL_FreeSurface(Surface);
 	} else {
-		loggerf("Loading path: " + path, Level::DEBUG);
 		SDL_ClearError();
-		surface = IMG_Load(path.c_str());
-
-		if (surface == nullptr) {
-			throw std::runtime_error("Image failed to load: " + std::string(SDL_GetError()));
+		SDL_Surface* Surface = IMG_Load(path.c_str());
+		if (!Surface) {
+			throw std::runtime_error("Image failed to load: " + std::string(IMG_GetError()));
 		}
 
 		if (Clip) {
-			SDL_SetClipRect(surface, NULL);
+			SDL_SetClipRect(Surface, NULL);
 		}
 
-		Texture = SDL_CreateTextureFromSurface(renderer, surface);
-		SDL_FreeSurface(surface);
-		Path = path;
+		Texture = SDL_CreateTextureFromSurface(renderer, Surface);
+		if (!Texture) {
+			throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
+		}
+		SDL_FreeSurface(Surface);
 	}
+	Path = path;
 }
 
 void TextureType::setScale(Vec2 scale) {
@@ -356,15 +354,12 @@ bool AnimationType::operator() () {
 // Frame
 
 Frame::Frame() {
-	Parent = NULL;
-	Texture = NULL;
-	Text = NULL;
-	//Children = {};
-	FrameInstances.insert(this);
 	EventCallbacks.resize(10);
-	CurrentFrame = 0;
-	Pivot = Vec2(0, 0);
-	Rotation = 0;
+	setPivot(SizeType(Vec2(0.5, 0.5), Vec2(0, 0)));
+	setSize(SizeType(Vec2(0.5, 0.5), Vec2(0, 0)));
+	setPosition(SizeType(Vec2(0.25, 0.25), Vec2(0, 0)));
+
+	FrameInstances.insert(this);
 }
 
 void Frame::setSize(SizeType size) {
@@ -484,8 +479,27 @@ void Frame::setAnimationFrame(unsigned int frame) {
 	CurrentFrame = (unsigned int) std::clamp((int) frame, 0, (int) Animation->getFrames().size());
 }
 
-void Frame::setPivot(Vec2 pivot) {
+void Frame::setPivot(SizeType pivot) {
 	Pivot = pivot;
+
+	int totalX = Pivot.Offset.X;
+	int totalY = Pivot.Offset.Y;
+
+	if (Size.Scale.X > 0.0 || Size.Scale.Y > 0.0) {
+		if (Parent == NULL) {
+			totalX += static_cast<int>(AbsoluteSize.X * Pivot.Scale.X);
+			totalY += static_cast<int>(AbsoluteSize.Y * Pivot.Scale.Y);
+		} else {
+			Vec2 parentPivot = Parent->getAbsolutePivot();
+			int parentX = parentPivot.X;
+			int parentY = parentPivot.Y;
+			
+			totalX += static_cast<int>(parentX * Pivot.Scale.X);
+			totalY += static_cast<int>(parentY * Pivot.Scale.Y);
+		}
+	}
+
+	AbsolutePivot = Vec2(totalX, totalY);
 }
 
 void Frame::setRotation(double rotation) {
@@ -598,8 +612,12 @@ unsigned int Frame::getAnimationFrame() {
 	return CurrentFrame;
 }
 
-Vec2 Frame::getPivot() {
+SizeType Frame::getPivot() {
 	return Pivot;
+}
+
+Vec2 Frame::getAbsolutePivot() {
+	return AbsolutePivot;
 }
 
 double Frame::getRotation() {
@@ -643,6 +661,7 @@ int cleanUpTextures() {
 	int ret = 0;
 	std::set<TextureType*> textures = TextureInstances;
 	for (TextureType* texture : textures) {
+		loggerf("MEMEME DELETE");
 		delete texture;
 		ret++;
 	}

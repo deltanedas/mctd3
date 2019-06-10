@@ -43,8 +43,13 @@ int cleanUpTiles() {
 Tile::Tile(std::string id) {
 	frame = new Frame();
 	SizeType tileSize;
+	tileSize.setScale(Vec2(0, 0));
 	tileSize.setOffset(Vec2(TileSize.X, TileSize.Y));
 	frame->setSize(tileSize);
+	SizeType tilePos;
+	tilePos.setScale(Vec2(0, 0));
+	tilePos.setOffset(Vec2(0, 0));
+	frame->setPosition(tilePos);
 	if (&TileTextures[id]) {
 		frame->setTexture(TileTextures[id]);
 	} else {
@@ -61,9 +66,14 @@ void Tile::setID(std::string id) {
 
 void Tile::setPosition(Vec2 position) {
 	SizeType pos;
+	pos.setScale(Vec2(0, 0));
 	pos.setOffset(Vec2(position.X * TileSize.X, position.Y * TileSize.Y));
 	frame->setPosition(pos);
 	Position = position;
+}
+
+void Tile::setBackground(bool background) {
+	Background = background;
 }
 
 std::string Tile::getID() {
@@ -76,6 +86,14 @@ Vec2 Tile::getPosition() {
 
 Frame* Tile::getFrame() {
 	return frame;
+}
+
+bool Tile::getBackground() {
+	return Background;
+}
+
+Tile Tile::operator=(const Tile& tile) {
+	frame = tile.frame;
 }
 
 std::set<Tile*> Tiles;

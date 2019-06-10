@@ -30,20 +30,25 @@ bool MCTD3_RenderLoop() {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 50, 255);
 		SDL_RenderClear(renderer);
 		for (Frame* frame : VisibleFrameInstances) {
+			loggerf("Seg");
 			Vec2 size = frame->getAbsoluteSize();
 			Vec2 pos = frame->getAbsolutePosition();
 			double rotation = frame->getRotation();
-			SDL_Point pivot_p = {(int) frame->getPivot().X, (int) frame->getPivot().Y};
+			SDL_Point pivot_p = {(int) frame->getAbsolutePivot().X, (int) frame->getAbsolutePivot().Y};
 			const SDL_Point* pivot = const_cast<SDL_Point*>(&pivot_p);
 			if (!frame->getAnchored()) {
 				pos -= Vec2(camera.X, camera.Y);
 			}
 			if (size.X < 1) size.X = 1;
 			if (size.Y < 1) size.Y = 1;
+			loggerf("fault");
 
-			if (frame->getTexture() != nullptr) {
+			if (frame->getTexture()) {
+				loggerf("yup");
+				SDL_ClearError();
 				SDL_Rect* textureRect = new SDL_Rect();
 				TextureType* texture = frame->getTexture();
+				loggerf("thats me");
 				size.X *= texture->getScale().X;
 				size.Y *= texture->getScale().Y;
 				if (size.X < 1) size.X = 1;
@@ -52,15 +57,20 @@ bool MCTD3_RenderLoop() {
 				textureRect->y = pos.Y;
 				textureRect->w = size.X;
 				textureRect->h = size.Y;
+				loggerf("You might");
 				SDL_ClearError();
 				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot, SDL_FLIP_NONE) != 0) {
 					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
 				}
 				delete textureRect;
 			}
+			loggerf("actually its not");
 
 			if (frame->getText() != nullptr) {
+				loggerf("dddactually its not");
 				if (frame->getText()->getFont() != nullptr) {
+					loggerf("eeeactually its not");
+					SDL_ClearError();
 					TextType* text = frame->getText();
 					FC_Font* font = text->getFont();
 					Vec2 textSize = text->getSize();
@@ -78,10 +88,12 @@ bool MCTD3_RenderLoop() {
 					FC_DrawScale(font, renderer, pos.X, pos.Y, scale, text->getText());
 				}
 			}
+			loggerf("kek");
 
-			if (frame->getAnimation()) {
+			if (frame->getAnimation() != nullptr) {
 				TextureType* texture = frame->getAnimation()->getFrames()[frame->getAnimationFrame()];
 				if (texture != nullptr) {
+					SDL_ClearError();
 					SDL_Rect* textureRect = new SDL_Rect();
 					size.X *= texture->getScale().X;
 					size.Y *= texture->getScale().Y;

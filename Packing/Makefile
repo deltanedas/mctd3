@@ -1,21 +1,18 @@
 BUILDDIR = build
 SOURCEDIR = src
 
-CXX = g++-8
+CXX = g++
 CXXFLAGS = -O3 -Wall -Weffc++ -ansi -pedantic -std=c++17 -I$(SOURCEDIR) -c -g
-LDFLAGS = -L. -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread -lstdc++fs -Wl,-rpath,'$$ORIGIN',--Bstatic -lSDL2_fontcache -Wl,-Bdynamic
+LDFLAGS = -L. -lstdc++fs -Wl,-rpath,'$$ORIGIN'
 
-EXEC_FILE = MCTD3
-OBJ = main.o mctd3.o logger.o simpleui.o main/fields.o main/functions.o main/init.o main/options.o main/loops.o
+EXEC_FILE = packer
+OBJ = packer.o
 OBJECTS = $(patsubst %, $(BUILDDIR)/%, $(OBJ))
 
 all: $(EXEC_FILE)
 
 run: $(EXEC_FILE)
 	./$(EXEC_FILE)
-
-debug: $(EXEC_FILE)
-	./$(EXEC_FILE) -d
 
 valgrind: $(EXEC_FILE)
 	valgrind --track-origins=yes --leak-check=full ./$(EXEC_FILE) -d

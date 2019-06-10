@@ -23,6 +23,8 @@ class Tile {
 		Vec2 getPosition();
 		Frame* getFrame();
 		bool getBackground();
+
+		Tile operator=(const Tile& tile);
 	private:
 		std::string ID;
 		Frame* frame;
