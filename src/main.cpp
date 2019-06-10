@@ -49,17 +49,29 @@ void oreDigCallback(EventType eventType) {
 void printHelp() {
 	printf("Command Line Options:");
 	printf("\t-d [--debug] - Print extra debug information to the log.\n");
+	printf("\t-u [--uiscript] <file> - Sets UI Lua script to the file, is 'ui.lua' by default.\n");
 	printf("\t-h [--help] - Print this help message.\n");
 }
 
 int main(int argc, char* argv[]) {
 	loggerf(Title);
 	if (argc > 1) {
-		bool failed = true;
+		bool failed = false;
+		int skip = 0;
 		for (int i = 1; i < argc; i++) {
 			std::string param = std::string(argv[i]);
 			if ((param.compare("-d") == 0) || (param.compare("--debug") == 0)) {
 				SimpleUI_debug = true;
+				continue;
+			}
+			if ((param.compare("-u") == 0) || (param.compare("--uiscript") == 0)) {
+				skip++;
+				if (argc > i) {
+					uiScriptPath = std::string(argv[i + 1]);
+				} else {
+					printHelp();
+					return 1;
+				}
 				continue;
 			}
 			if ((param.compare("-h") == 0) || (param.compare("--help") == 0)) {
@@ -70,7 +82,12 @@ int main(int argc, char* argv[]) {
 				failed = false;
 				loggerf("Use '" + std::string(argv[0]) + " --help' for help with parameters.", Level::WARN);
 			}
+			if (skip > 0) {
+				skip--;
+				continue;
+			}
 			loggerf("Unknown parameter: " + param, Level::WARN);
+			failed = true;
 		}
 	}
 	loggerf("SDL_FontCache version: " + FC_GetVersion(), Level::DEBUG);

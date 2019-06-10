@@ -3,7 +3,7 @@ SOURCEDIR = src
 
 CXX = g++-8
 CXXFLAGS = -O3 -Wall -Weffc++ -ansi -pedantic -std=c++17 -I$(SOURCEDIR) -c -g
-LDFLAGS = -L. -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread -lstdc++fs -Wl,-rpath,'$$ORIGIN',--Bstatic -lSDL2_fontcache -Wl,-Bdynamic
+LDFLAGS = -L. -llua5.3 -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread -lstdc++fs -Wl,-rpath,'$$ORIGIN',--Bstatic -lSDL2_fontcache -Wl,-Bdynamic
 
 EXEC_FILE = MCTD3
 OBJ = main.o mctd3.o logger.o simpleui.o main/fields.o main/functions.o main/init.o main/options.o main/loops.o

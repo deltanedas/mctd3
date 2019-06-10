@@ -1,4 +1,10 @@
 #include "main/main.h"
+#include <lua5.3/lua.h>
+#include <lua5.3/lauxlib.h>
+#include <lua5.3/lualib.h>
+#include <LuaBridge/LuaBridge.h>
+
+using namespace luabridge; //I'm sorry but it'll drive me insane otherwise.
 
 bool MCTD3_InitSDL() {
 	loggerf("Initialising SDL.", Level::DEBUG);
@@ -69,7 +75,8 @@ bool MCTD3_InitUI() {
 	initTextures();
 	FC_Font* minecraftFont = FC_CreateFont();
 	SDL_Color color = FC_MakeColor(0, 255, 0, 255);
-	FC_LoadFont(minecraftFont, renderer, "assets/minecraftia.ttf", 24, color, TTF_STYLE_NORMAL);
+	Uint8 res = FC_LoadFont(minecraftFont, renderer, "assets/minecraftia.ttf", 24, color, TTF_STYLE_NORMAL);
+	loggerf("Loaded font: " + std::to_string(res));
 	Tile* stone = new Tile("stone");
 	Tile* stone2 = new Tile("stone");
 	stone2->setPosition(Vec2(1, 0));
@@ -86,6 +93,7 @@ bool MCTD3_InitUI() {
 	Tile* stone7 = new Tile("stone");
 	stone7->setPosition(Vec2(1, 2));
 	Tile* stone8 = new Tile("stone");
+	
 	stone8->setPosition(Vec2(2, 2));
 
 	std::vector<TextureType*> textures = {};
@@ -95,15 +103,13 @@ bool MCTD3_InitUI() {
 	}
 	AnimationType* breakAnim = new AnimationType(textures);
 
-	loggerf("Ali-A");
 	for (Tile* tile : Tiles) {
 		Frame* frame = tile->getFrame();
 		frame->setVisible(true);
 		frame->setEventCallback(EventEnum::MOUSE_DOWN, oreDigCallback);
 		frame->setAnimation(breakAnim);
 	}
-	loggerf("broken");
-
+/*
 	label = new Frame();
 		SizeType labelSize;
 		labelSize.setScale(Vec2(0.4, 0.1));
@@ -120,6 +126,30 @@ bool MCTD3_InitUI() {
 		labelTexture->setColour(labelColour);
 	label->setTexture(labelTexture);
 	label->setVisible(true);
+*/
+
+	
+	lua_State* luaState = luaL_newstate();
+
+	getGlobalNamespace(luaState)
+		.beginNamespace("SimpleUI")
+			.addFunction("loggerf", loggerf, "string", "int")
+		.endNamespace();
+
+	if (luaL_loadfile(luaState, uiScriptPath.c_str())) {
+		throw std::runtime_error("Failed to load UI Script '" + uiScriptPath + "'.");
+	}
+	luaL_openlibs(luaState);
+
+	int scriptError = lua_pcall(luaState, 0, 0, 0);
+	while (scriptError && lua_gettop(luaState)) {
+		loggerf(std::string(lua_tostring(luaState, -1)), Level::ERROR);
+		lua_pop(luaState, 1);
+		scriptError = lua_pcall(luaState, 0, 0, 0);
+	}
+	if (scriptError) {
+		throw std::runtime_error("Failed to run UI Script.");
+	}
 
 	loggerf("UI initialised.");
 	return true;

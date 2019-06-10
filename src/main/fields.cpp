@@ -15,3 +15,5 @@ int key_toggleFullscreen = SDLK_F11;
 bool MCTD3_EventLoop_running = false;
 bool MCTD3_RenderLoop_running = false;
 bool MCTD3_LogicLoop_running = false;
+
+std::string uiScriptPath = "ui.lua";

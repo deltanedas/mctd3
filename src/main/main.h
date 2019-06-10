@@ -42,6 +42,8 @@ extern bool MCTD3_EventLoop_running;
 extern bool MCTD3_RenderLoop_running;
 extern bool MCTD3_LogicLoop_running;
 
+extern std::string uiScriptPath;
+
 extern std::string defaultLabelText;
 extern Frame* label;
 

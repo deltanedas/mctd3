@@ -1,7 +1,7 @@
 # mctd3
-Requires SDL2, SDL2_image, SDL2_ttf, SDL2_mixer.
+Requires SDL2, SDL2_image, SDL2_ttf, SDL2_mixer and Lua 5.3.
 On Debian and its derivatives:
-  `sudo apt install libsdl2-2.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-mixer-2.0.0`
+  `sudo apt install libsdl2-2.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-mixer-2.0.0 liblua5.3-dev lua5.3-0`
 
 An official unofficial sequel to the legendary flash game Minecraft Tower Defense 2. This version is based on SDL2, rather than flash.
 
@@ -13,6 +13,7 @@ You can use your own textures with the Packer/Unpacker programs in Packing.
 
 **Dependencies**
 g++-8, SDL2, SDL2_image, SDL2_ttf, [SDL2_fontcache \(C++ version\)](https://github.com/deltanedas/SDL_fontcache/), [LuaBridge](https://github.com/vinniefalco/LuaBridge) pthread
+Move the Source/LuaBridge folder to /usr/include/ or src/
 
 **On \*NIX**
 1. `make run`
