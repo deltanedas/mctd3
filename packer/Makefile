@@ -4,40 +4,33 @@ SOURCEDIR = src
 
 CXX = g++
 CXXFLAGS = -O3 -Wall -Weffc++ -ansi -pedantic -std=c++17 -I$(SOURCEDIR) -c -g
-LDFLAGS = -L$(SOURCEDIR) -llua5.3 -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread -lstdc++fs -Wl,-rpath,'$$ORIGIN',--Bstatic -lSDL2_fontcache -Wl,-Bdynamic
+LDFLAGS = -L. -lstdc++fs -Wl,-rpath,'$$ORIGIN'
 
-EXEC_FILE = MCTD3
-OBJ = main mctd3 main/fields main/functions main/init main/options main/loops
+EXEC_FILE = packer
+OBJ = packer
 OBJECTS = $(patsubst %, $(OBJECTDIR)/%.o, $(OBJ))
 
 DEBUGGER = valgrind
 DEBUGGERFLAGS = --track-origins=yes --leak-check=full
 
-all: $(EXEC_FILE) packer
+all: $(EXEC_FILE)
 
 run: $(EXEC_FILE)
 	$(BUILDDIR)/$(EXEC_FILE)
 
 debug: $(EXEC_FILE)
-	$(DEBUGGER) $( $(BUILDDIR)/$(EXEC_FILE) -d
+	$(DEBUGGER) $(DEBUGGERFLAGS) $(BUILDDIR)/$(EXEC_FILE) -d
 
 $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.cpp
 	mkdir -p $(OBJECTDIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJECTDIR)/main/%.o: $(SOURCEDIR)/main/%.cpp
-	mkdir -p $(OBJECTDIR)/main/
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
 $(EXEC_FILE): $(OBJECTS)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	mkdir -p $(BUILDDIR)
+	$(CXX) -o $(BUILDDIR)/$@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJECTDIR)
 	rm -f $(BUILDDIR)/$(EXEC_FILE)
 
 remake: clean $(EXEC_FILE)
-
-packer:
-	cd packer
-	make
