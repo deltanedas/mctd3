@@ -6,13 +6,13 @@ bool ricardoFocused = false;
 void ricardoFunc(EventType eventType) {
 	if (ricardoFocused) {
 		SDL_KeyboardEvent e = eventType.KeyboardEvent;
-		loggerf(std::to_string(e.keysym.sym));
+		SimpleUI_Log(std::to_string(e.keysym.sym));
 	}
 }
 
 void ricardoFocus(EventType eventType) {
 	SDL_MouseButtonEvent e = eventType.MouseButtonEvent;
-	loggerf("Mouse Up.", Level::DEBUG);
+	SimpleUI_Log("Mouse Up.", Level::DEBUG);
 	if (e.button == 1) {
 		ricardoFocused = false;
 		if (eventType.Caller->isPointInBounds(e.x, e.y, true)) {
@@ -31,7 +31,7 @@ void setText(std::string text, int count) {
 
 void oreDigCallback(EventType eventType) {
 	SDL_MouseButtonEvent e = eventType.MouseButtonEvent;
-	loggerf("Yo ive been clicked.");
+	SimpleUI_Log("Yo ive been clicked.");
 	if (e.button == 1) {
 		if (eventType.Caller->isPointInBounds(e.x, e.y, true)) {
 			mineCount[eventType.Caller]++;
@@ -54,7 +54,7 @@ void printHelp() {
 }
 
 int main(int argc, char* argv[]) {
-	loggerf(Title);
+	SimpleUI_Log(Title);
 	if (argc > 1) {
 		bool failed = false;
 		int skip = 0;
@@ -80,26 +80,26 @@ int main(int argc, char* argv[]) {
 			}
 			if (failed) {
 				failed = false;
-				loggerf("Use '" + std::string(argv[0]) + " --help' for help with parameters.", Level::WARN);
+				SimpleUI_Log("Use '" + std::string(argv[0]) + " --help' for help with parameters.", Level::WARN);
 			}
 			if (skip > 0) {
 				skip--;
 				continue;
 			}
-			loggerf("Unknown parameter: " + param, Level::WARN);
+			SimpleUI_Log("Unknown parameter: " + param, Level::WARN);
 			failed = true;
 		}
 	}
-	loggerf("SDL_FontCache version: " + FC_GetVersion(), Level::DEBUG);
+	SimpleUI_Log("SDL_FontCache version: " + FC_GetVersion(), Level::DEBUG);
 	try {
 		bool initCode = MCTD3_Init();
 		if (initCode == false) {
-			loggerf("MCTD3 abnormally shut down.", Level::WARN);
+			SimpleUI_Log("MCTD3 abnormally shut down.", Level::WARN);
 			return 1;
 		}
 		return 0;
 	} catch (std::exception& e) {
-		loggerf("Exception caught: " + std::string(e.what()), Level::ERROR);
+		SimpleUI_Log("Exception caught: " + std::string(e.what()), Level::ERROR);
 		return 1;
 	}
 }

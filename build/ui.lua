@@ -6,7 +6,7 @@ end
 for i,v in pairs(SimpleUI) do
 	_ENV[i] = v
 end
-
+--[[
 local label = Frame()
 local size = Size()
 	size.setScale(Vec2(0.4, 0.1))
@@ -24,4 +24,5 @@ local texture = Texture()
 	label.setTexture(texture)
 label.setVisible()
 label.setAnchored()
-loggerf("done label shit", Level.DEBUG)
+]]
+SimpleUI_Log("done label shit", Level.DEBUG)

@@ -1,33 +1,30 @@
 #include "main/main.h"
-#include <lua5.3/lua.h>
-#include <lua5.3/lauxlib.h>
-#include <lua5.3/lualib.h>
-#include <LuaBridge/LuaBridge.h>
+#include "luawrapper.h"
 
 using namespace luabridge; //I'm sorry but it'll drive me insane otherwise.
 
 bool MCTD3_InitSDL() {
-	loggerf("Initialising SDL.", Level::DEBUG);
+	SimpleUI_Log("Initialising SDL.", Level::DEBUG);
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		if (SDL_CreateWindowAndRenderer(windowSize.X, windowSize.Y, SDL_WINDOW_RESIZABLE, &window, &renderer) == 0) {
-			if (SimpleUI_fullscreen) {
-				loggerf("Entering fullscreen.", Level::DEBUG);
+			if (MCTD3_fullscreen) {
+				SimpleUI_Log("Entering fullscreen.", Level::DEBUG);
 				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 			}
 			if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-				loggerf("SDL Image failed to intialise: " + std::string(IMG_GetError()), Level::ERROR);
+				SimpleUI_Log("SDL Image failed to intialise: " + std::string(IMG_GetError()), Level::ERROR);
 				return false;
 			}
 			if (TTF_Init() == -1) {
-				loggerf("SDL TTF failed to intialise: " + std::string(TTF_GetError()), Level::ERROR);
+				SimpleUI_Log("SDL TTF failed to intialise: " + std::string(TTF_GetError()), Level::ERROR);
 				return false;
 			}
 			screenSurface = SDL_GetWindowSurface(window);
-			loggerf("Screen surface got from window.", Level::DEBUG);
+			SimpleUI_Log("Screen surface got from window.", Level::DEBUG);
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			loggerf("Renderer blend mode set.", Level::DEBUG);
+			SimpleUI_Log("Renderer blend mode set.", Level::DEBUG);
 			SDL_SetWindowTitle(window, Title.c_str());
-			loggerf("Window title set.", Level::DEBUG);
+			SimpleUI_Log("Window title set.", Level::DEBUG);
 			SDL_SetHint("_NET_WM_BYPASS_COMPOSITOR", "2");
 			SDL_ClearError();
 			SDL_Surface* iconSurface = IMG_Load("assets/icon.png");
@@ -35,7 +32,7 @@ bool MCTD3_InitSDL() {
 				throw std::runtime_error("Icon failed to load: " + std::string(SDL_GetError()) + "\n\tAre you running from assets' parent directory?");
 			}
 			SDL_SetWindowIcon(window, iconSurface);
-			loggerf("Window icon set.", Level::DEBUG);
+			SimpleUI_Log("Window icon set.", Level::DEBUG);
 			SDL_DisplayMode dm;
 			SDL_ClearError();
 			if (SDL_GetCurrentDisplayMode(0, &dm) != 0) {
@@ -43,25 +40,24 @@ bool MCTD3_InitSDL() {
 			}
 			screenSize.X = dm.w;
 			screenSize.Y = dm.h;
-			loggerf("Your screen size is " + screenSize.to_string() + ".", Level::DEBUG);
+
 			aspectRatio = screenSize.Y / screenSize.X;
-			loggerf("Aspect ratio is " + std::to_string(aspectRatio) + ".", Level::DEBUG);
+
 			TileSize.X = (options["resY"] / aspectRatio) / 10;
 			TileSize.Y = (options["resX"] * aspectRatio) / 10;
-			loggerf("Tile Size is " + TileSize.to_string() + ".", Level::DEBUG);
 			int windowX;
 			int windowY;
 			SDL_GetWindowSize(window, &windowX, &windowY);
 			windowSize = Vec2(windowX, windowY);
 			cameraBounds = Vec2(options["resX"] - TileSize.X * 3, options["resY"] - TileSize.Y * 3);
-			loggerf("SDL initialised.");
+			SimpleUI_Log("SDL initialised.");
 			return true;
 		} else {
-			loggerf("SDL failed to create window and/or renderer: " + std::string(SDL_GetError()), Level::ERROR);
+			SimpleUI_Log("SDL failed to create window and/or renderer: " + std::string(SDL_GetError()), Level::ERROR);
 			return false;
 		}
 	} else {
-		loggerf("SDL failed to initialise: " + std::string(SDL_GetError()), Level::ERROR);
+		SimpleUI_Log("SDL failed to initialise: " + std::string(SDL_GetError()), Level::ERROR);
 		return false;
 	}
 }
@@ -71,12 +67,12 @@ Frame* label;
 void oreDigCallback(EventType eventType);
 
 bool MCTD3_InitUI() {
-	loggerf("Initialising UI.", Level::DEBUG);
+	SimpleUI_Log("Initialising UI.", Level::DEBUG);
 	initTextures();
 	FC_Font* minecraftFont = FC_CreateFont();
 	SDL_Color color = FC_MakeColor(0, 255, 0, 255);
 	Uint8 res = FC_LoadFont(minecraftFont, renderer, "assets/minecraftia.ttf", 24, color, TTF_STYLE_NORMAL);
-	loggerf("Loaded font: " + std::to_string(res));
+	SimpleUI_Log("Loaded font: " + std::to_string(res));
 	Tile* stone = new Tile("stone");
 	Tile* stone2 = new Tile("stone");
 	stone2->setPosition(Vec2(1, 0));
@@ -128,29 +124,9 @@ bool MCTD3_InitUI() {
 	label->setVisible(true);
 */
 
-	
-	lua_State* luaState = luaL_newstate();
 
-	getGlobalNamespace(luaState)
-		.beginNamespace("SimpleUI")
-			.addFunction("loggerf", loggerf, "string", "int")
-		.endNamespace();
+	MCTD3_WrapSimpleUI();
 
-	if (luaL_loadfile(luaState, uiScriptPath.c_str())) {
-		throw std::runtime_error("Failed to load UI Script '" + uiScriptPath + "'.");
-	}
-	luaL_openlibs(luaState);
-
-	int scriptError = lua_pcall(luaState, 0, 0, 0);
-	while (scriptError && lua_gettop(luaState)) {
-		loggerf(std::string(lua_tostring(luaState, -1)), Level::ERROR);
-		lua_pop(luaState, 1);
-		scriptError = lua_pcall(luaState, 0, 0, 0);
-	}
-	if (scriptError) {
-		throw std::runtime_error("Failed to run UI Script.");
-	}
-
-	loggerf("UI initialised.");
+	SimpleUI_Log("UI initialised.");
 	return true;
 }

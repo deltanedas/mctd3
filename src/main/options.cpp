@@ -21,28 +21,28 @@ bool MCTD3_LoadOptions() {
 			std::string option;
 			int value;
 			if (!(iss >> option >> value)) {
-				loggerf("Failed to read option line '" + line + "'.", Level::WARN);
+				SimpleUI_Log("Failed to read option line '" + line + "'.", Level::WARN);
 				continue;
 			}
 			if (option == "resX") {
 				if (value > 0) {
 					options["resX"] = value;
 					windowSize.X = value;
-					loggerf("Window width set to " + std::to_string(value), Level::DEBUG);
+					SimpleUI_Log("Window width set to " + std::to_string(value), Level::DEBUG);
 				} else {
-					loggerf("Window width must be greater than 0.", Level::WARN);
+					SimpleUI_Log("Window width must be greater than 0.", Level::WARN);
 				}
 			} else if (option == "resY") {
 				if (value > 0) {
 					options["resY"] = value;
 					windowSize.Y = value;
-					loggerf("Window height set to " + std::to_string(value), Level::DEBUG);
+					SimpleUI_Log("Window height set to " + std::to_string(value), Level::DEBUG);
 				} else {
-					loggerf("Window height must be greater than 0.", Level::WARN);
+					SimpleUI_Log("Window height must be greater than 0.", Level::WARN);
 				}
 			} else if (option == "fullscreen") {
-				SimpleUI_fullscreen = (value == 1 ? 1 : 0);
-				options["fullscreen"] = SimpleUI_fullscreen;
+				MCTD3_fullscreen = (value == 1 ? 1 : 0);
+				options["fullscreen"] = MCTD3_fullscreen;
 			} else if (option == "key_toggleFullscreen") {
 				options["key_toggleFullscreen"] = value;
 				key_toggleFullscreen = value;
@@ -59,7 +59,7 @@ bool MCTD3_LoadOptions() {
 				options["key_moveCameraRight"] = value;
 				key_moveCameraRight = value;
 			} else {
-				loggerf("Unknown option '" + option + "'.", Level::WARN);
+				SimpleUI_Log("Unknown option '" + option + "'.", Level::WARN);
 			}
 		}
 	}
@@ -69,13 +69,13 @@ bool MCTD3_LoadOptions() {
 bool MCTD3_SaveOptions() {
 	std::ofstream optionsFile("options.txt");
 	if (optionsFile) {
-		loggerf("Writing options to options.txt.", Level::DEBUG);
+		SimpleUI_Log("Writing options to options.txt.", Level::DEBUG);
 		for (auto const &it : options) {
-			loggerf("\tOption '" + it.first + "' = " + std::to_string(it.second), Level::DEBUG);
+			SimpleUI_Log("\tOption '" + it.first + "' = " + std::to_string(it.second), Level::DEBUG);
 			optionsFile << it.first + " " + std::to_string(it.second) << std::endl ;
 		}
 	} else {
-		loggerf("Failed to write options to options.txt: " + std::to_string(errno), Level::ERROR);
+		SimpleUI_Log("Failed to write options to options.txt: " + std::to_string(errno), Level::ERROR);
 	}
 	return true;
 }

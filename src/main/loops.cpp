@@ -1,11 +1,11 @@
 #include "main/main.h"
 
 bool MCTD3_EventLoop() {
-	loggerf("Event loop started.");
+	SimpleUI_Log("Event loop started.");
 
 	MCTD3_EventLoop_running = true;
 
-	while (!SimpleUI_closing) {
+	while (!MCTD3_closing) {
 		MCTD3_RawTick();
 		lastTime = SDL_GetTicks();
 		MCTD3_ProcessEvents();
@@ -13,24 +13,24 @@ bool MCTD3_EventLoop() {
 
 	MCTD3_EventLoop_running = false;
 
-	loggerf("Event loop finished.", Level::DEBUG);
+	SimpleUI_Log("Event loop finished.", Level::DEBUG);
 	return true;
 }
 
 bool MCTD3_RenderLoop() {
-	loggerf("Render loop started.");
-	loggerf("Took " + std::to_string(SDL_GetTicks()) + "ms to enter render loop.", Level::DEBUG);
+	SimpleUI_Log("Render loop started.");
+	SimpleUI_Log("Took " + std::to_string(SDL_GetTicks()) + "ms to enter render loop.", Level::DEBUG);
 
 	MCTD3_RenderLoop_running = true;
 
-	while (!SimpleUI_closing) {
+	while (!MCTD3_closing) {
 		MCTD3_Tick();
 		tickCount++;
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 50, 255);
 		SDL_RenderClear(renderer);
 		for (Frame* frame : VisibleFrameInstances) {
-			loggerf("Seg");
+			SimpleUI_Log("Seg");
 			Vec2 size = frame->getAbsoluteSize();
 			Vec2 pos = frame->getAbsolutePosition();
 			double rotation = frame->getRotation();
@@ -41,14 +41,14 @@ bool MCTD3_RenderLoop() {
 			}
 			if (size.X < 1) size.X = 1;
 			if (size.Y < 1) size.Y = 1;
-			loggerf("fault");
+			SimpleUI_Log("fault");
 
 			if (frame->getTexture()) {
-				loggerf("yup");
+				SimpleUI_Log("yup");
 				SDL_ClearError();
 				SDL_Rect* textureRect = new SDL_Rect();
 				TextureType* texture = frame->getTexture();
-				loggerf("thats me");
+				SimpleUI_Log("thats me");
 				size.X *= texture->getScale().X;
 				size.Y *= texture->getScale().Y;
 				if (size.X < 1) size.X = 1;
@@ -57,19 +57,19 @@ bool MCTD3_RenderLoop() {
 				textureRect->y = pos.Y;
 				textureRect->w = size.X;
 				textureRect->h = size.Y;
-				loggerf("You might");
+				SimpleUI_Log("You might");
 				SDL_ClearError();
 				if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot, SDL_FLIP_NONE) != 0) {
-					loggerf("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
+					SimpleUI_Log("Failed to render texture: " + std::string(SDL_GetError()), Level::WARN);
 				}
 				delete textureRect;
 			}
-			loggerf("actually its not");
+			SimpleUI_Log("actually its not");
 
 			if (frame->getText() != nullptr) {
-				loggerf("dddactually its not");
+				SimpleUI_Log("dddactually its not");
 				if (frame->getText()->getFont() != nullptr) {
-					loggerf("eeeactually its not");
+					SimpleUI_Log("eeeactually its not");
 					SDL_ClearError();
 					TextType* text = frame->getText();
 					FC_Font* font = text->getFont();
@@ -88,7 +88,7 @@ bool MCTD3_RenderLoop() {
 					FC_DrawScale(font, renderer, pos.X, pos.Y, scale, text->getText());
 				}
 			}
-			loggerf("kek");
+			SimpleUI_Log("kek");
 
 			if (frame->getAnimation() != nullptr) {
 				TextureType* texture = frame->getAnimation()->getFrames()[frame->getAnimationFrame()];
@@ -105,7 +105,7 @@ bool MCTD3_RenderLoop() {
 					textureRect->h = size.Y;
 					SDL_ClearError();
 					if (SDL_RenderCopyEx(renderer, texture->getTexture(), NULL, textureRect, rotation, pivot, SDL_FLIP_NONE) != 0) {
-						loggerf("Failed to render animation frame: " + std::string(SDL_GetError()), Level::WARN);
+						SimpleUI_Log("Failed to render animation frame: " + std::string(SDL_GetError()), Level::WARN);
 					}
 					delete textureRect;
 				}
@@ -117,18 +117,18 @@ bool MCTD3_RenderLoop() {
 
 	MCTD3_RenderLoop_running = false;
 
-	loggerf("Render loop finished.", Level::DEBUG);
+	SimpleUI_Log("Render loop finished.", Level::DEBUG);
 	return true;
 }
 
 bool MCTD3_LogicLoop() {
-	loggerf("Logic loop started.");
+	SimpleUI_Log("Logic loop started.");
 
 	MCTD3_LogicLoop_running = true;
 
 	srand(time(0));
 	int counter = 0;
-	while (!SimpleUI_closing) {
+	while (!MCTD3_closing) {
 		MCTD3_Tick();
 		if (RandomInt(1, 600) == 69) {
 			counter++;
@@ -137,15 +137,15 @@ bool MCTD3_LogicLoop() {
 
 	MCTD3_LogicLoop_running = false;
 
-	loggerf("Logic loop finished.", Level::DEBUG);
+	SimpleUI_Log("Logic loop finished.", Level::DEBUG);
 	return true;
 }
 
 bool MCTD3_StartLoops() {
-	loggerf("Starting loops.");
+	SimpleUI_Log("Starting loops.");
 
 	if (framerateCap == 0) {
-		loggerf("Framerate has no cap.", Level::DEBUG);
+		SimpleUI_Log("Framerate has no cap.", Level::DEBUG);
 		nextFrameTicks = 0;
 		MCTD3_Tick = MCTD3_RawTick;
 	} else {

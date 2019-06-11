@@ -22,7 +22,7 @@ debug: $(EXEC_FILE)
 	$(DEBUGGER) $(DEBUGGERFLAGS) $(BUILDDIR)/$(EXEC_FILE) -d
 
 $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.cpp
-	mkdir -p $(OBJECTDIR)
+	mkdir -p `dirname $@`
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(EXEC_FILE): $(OBJECTS)

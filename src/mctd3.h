@@ -1,7 +1,9 @@
 #pragma once
 
 #include <filesystem>
-#include "simpleui.h"
+#include <simpleui.h>
+
+using namespace SimpleUI; //sorry not sorry.
 
 extern Vec2 TileSize;
 extern std::map<std::string, TextureType*> TileTextures;

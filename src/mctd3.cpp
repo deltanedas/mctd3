@@ -5,21 +5,21 @@ std::map<std::string, TextureType*> TileTextures;
 ColourType blankColour(128, 0, 128);
 
 void initTextures() {
-	loggerf("Loading textures...", Level::DEBUG);
+	SimpleUI_Log("Loading textures...", Level::DEBUG);
 	for (const auto& entry : std::filesystem::directory_iterator("assets/blocks")) {
 		if (std::filesystem::is_regular_file(entry)) {
 			std::string filePath = entry.path();
 			std::string fileName = std::filesystem::path(filePath).stem();
 			std::string extension = std::filesystem::path(filePath).extension();
 			if (extension.compare(".png") == 0) {
-				loggerf("Loading texture '" + fileName + ".png'.", Level::DEBUG);
+				SimpleUI_Log("Loading texture '" + fileName + ".png'.", Level::DEBUG);
 				TileTextures[fileName] = new TextureType("assets/blocks/" + fileName + ".png");
 			} else {
-				loggerf("Texture '" + fileName + "' must be a .png file.", Level::WARN);
+				SimpleUI_Log("Texture '" + fileName + "' must be a .png file.", Level::WARN);
 			}
 		}
 	}
-	loggerf("Textures loaded.");
+	SimpleUI_Log("Textures loaded.");
 }
 
 void updateTilePositions() {
@@ -53,7 +53,7 @@ Tile::Tile(std::string id) {
 	if (&TileTextures[id]) {
 		frame->setTexture(TileTextures[id]);
 	} else {
-		loggerf("Texture '" + id + "' not found.", Level::WARN);
+		SimpleUI_Log("Texture '" + id + "' not found.", Level::WARN);
 	}
 	frame->setParent();
 	Tiles.insert(this);

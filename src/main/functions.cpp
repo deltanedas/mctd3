@@ -7,7 +7,7 @@ std::function<void(void)> MCTD3_RawTick = std::function<void(void)>([](void){
 });
 
 std::function<void(void)> MCTD3_Tick = std::function<void(void)>([](void){
-	while (SimpleUI_paused) {
+	while (MCTD3_paused) {
 		SDL_Delay(nextFrameTicks);
 	}
 	MCTD3_RawTick();
@@ -23,7 +23,7 @@ int RandomInt(int min, int max) {
 
 bool MCTD3_ProcessEvents() {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	if (!SimpleUI_paused) {
+	if (!MCTD3_paused) {
 		if (state[key_moveCameraUp]) {
 			camera.Move(0.0, TileSize.Y / 128);
 		} else if (state[key_moveCameraDown]) {
@@ -37,63 +37,63 @@ bool MCTD3_ProcessEvents() {
 	}
 
 	while (SDL_PollEvent(&event)) {
-		if (!SimpleUI_paused) {
+		if (!MCTD3_paused) {
 			updateEvents();
 		}
 		switch (event.type) {
 			case SDL_QUIT:
-				SimpleUI_closing = true;
+				MCTD3_paused = true;
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE:
-						SimpleUI_closing = true;
+						MCTD3_paused = true;
 						break;
 					case SDLK_r:
-						SimpleUI_closing = true;
-						SimpleUI_restarting = true;
+						MCTD3_paused = true;
+						MCTD3_restarting = true;
 						break;
 					case SDLK_p:
-						if (SimpleUI_paused) {
-							loggerf("Unpaused");
-							SimpleUI_paused = false;
+						if (MCTD3_paused) {
+							SimpleUI_Log("Unpaused");
+							MCTD3_paused = false;
 						} else {
-							loggerf("Paused");
-							SimpleUI_paused = true;
+							SimpleUI_Log("Paused");
+							MCTD3_paused = true;
 						}
 				}
-				if (!SimpleUI_paused) {
+				if (!MCTD3_paused) {
 					int key = event.key.keysym.sym;
 					switch (event.key.keysym.sym) {
 						case SDLK_c:
-							loggerf("Manually clearing frames on screen.");
+							SimpleUI_Log("Manually clearing frames on screen.");
 							cleanUpFrames();
 							break;
 						case SDLK_t:
-							loggerf("Toggling frames that are visible.");
+							SimpleUI_Log("Toggling frames that are visible.");
 							for (Frame* frame : FrameInstances) {
 								frame->toggleVisible();
 							}
 							break;
 						case SDLK_y:
-							loggerf("Toggling frames that are anchored.");
+							SimpleUI_Log("Toggling frames that are anchored.");
 							for (Frame* frame : FrameInstances) {
 								frame->toggleAnchored();
 							}
 							break;
 						case SDLK_h:
-							loggerf("Resetting camera.");
+							SimpleUI_Log("Resetting camera.");
 							camera.X = 0;
 							camera.Y = 0;
 							break;
 					}
 					if (key == key_toggleFullscreen) {
-						loggerf("Toggled fullscreen.");
-						if (SimpleUI_fullscreen) {
-							SimpleUI_fullscreen = false;
+						SimpleUI_Log("Toggled fullscreen.");
+						if (MCTD3_paused) {
+							MCTD3_paused = false;
 							SDL_SetWindowFullscreen(window, SDL_WINDOW_RESIZABLE);
 						} else {
-							SimpleUI_fullscreen = true;
+							MCTD3_paused = true;
 							SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 						}
 						break;
@@ -103,11 +103,11 @@ bool MCTD3_ProcessEvents() {
 			case SDL_WINDOWEVENT:
 				switch (event.window.event) {
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						loggerf("Resized window to X: " + std::to_string(event.window.data1) + ", Y: " + std::to_string(event.window.data2) + ".", Level::DEBUG);
+						SimpleUI_Log("Resized window to X: " + std::to_string(event.window.data1) + ", Y: " + std::to_string(event.window.data2) + ".", Level::DEBUG);
 						windowSize = Vec2(event.window.data1, event.window.data2);
 						TileSize.X = (windowSize.Y / aspectRatio) / 10;
 						TileSize.Y = (windowSize.X * aspectRatio) / 10;
-						loggerf("Tile Size: " + TileSize.to_string(), Level::DEBUG);
+						SimpleUI_Log("Tile Size: " + TileSize.to_string(), Level::DEBUG);
 						Vec2 oldBounds = cameraBounds;
 						cameraBounds = Vec2(windowSize.X - TileSize.X * 3, windowSize.Y - TileSize.Y * 3);
 						updateTilePositions();
@@ -133,9 +133,9 @@ bool MCTD3_Init() {
 				if (loopCode) {
 					bool closeCode = MCTD3_Close();
 					if (closeCode) {
-						if (SimpleUI_restarting) {
-							SimpleUI_restarting = false;
-							SimpleUI_closing = false;
+						if (MCTD3_restarting) {
+							MCTD3_restarting = false;
+							MCTD3_paused = false;
 							return MCTD3_Init();
 						}
 						return true;
@@ -149,47 +149,47 @@ bool MCTD3_Init() {
 
 bool MCTD3_Close() {
 	if (MCTD3_EventLoop_running) {
-		loggerf("Waiting for event loop to finish...");
+		SimpleUI_Log("Waiting for event loop to finish...");
 		while (MCTD3_EventLoop_running) {
 			SDL_Delay(1);
 		}
 	}
 
 	if (MCTD3_RenderLoop_running) {
-		loggerf("Waiting for render loop to finish...");
+		SimpleUI_Log("Waiting for render loop to finish...");
 		while (MCTD3_RenderLoop_running) {
 			SDL_Delay(1);
 		}
 	}
 
 	if (MCTD3_LogicLoop_running) {
-		loggerf("Waiting for logic loop to finish...");
+		SimpleUI_Log("Waiting for logic loop to finish...");
 		while (MCTD3_LogicLoop_running) {
 			SDL_Delay(1);
 		}
 	}
 
 
-	loggerf("MCTD3 shutting down.", Level::DEBUG);
+	SimpleUI_Log("MCTD3 shutting down.", Level::DEBUG);
 	cleanUpSimpleUI();
-	loggerf("\t" + std::to_string(cleanUpTiles()) + " tile(s) cleaned up.", Level::DEBUG);
+	SimpleUI_Log("\t" + std::to_string(cleanUpTiles()) + " tile(s) cleaned up.", Level::DEBUG);
 	if (window != nullptr) {
-		loggerf("\tDestroying window.", Level::DEBUG);
+		SimpleUI_Log("\tDestroying window.", Level::DEBUG);
 		SDL_DestroyWindow(window);
 	}
 	if (renderer != nullptr) {
-		loggerf("\tDestroying renderer.", Level::DEBUG);
+		SimpleUI_Log("\tDestroying renderer.", Level::DEBUG);
 		SDL_DestroyRenderer(renderer);
 	}
-	loggerf("\tQuitting SDL.", Level::DEBUG);
-	loggerf("\t\tQuitting SDL2-image.", Level::DEBUG);
+	SimpleUI_Log("\tQuitting SDL.", Level::DEBUG);
+	SimpleUI_Log("\t\tQuitting SDL2-image.", Level::DEBUG);
 	IMG_Quit();
-	loggerf("\t\tQuitting SDL2-ttf.", Level::DEBUG);
+	SimpleUI_Log("\t\tQuitting SDL2-ttf.", Level::DEBUG);
 	TTF_Quit();
-	loggerf("\t\tQuitting SDL2.", Level::DEBUG);
+	SimpleUI_Log("\t\tQuitting SDL2.", Level::DEBUG);
 	SDL_Quit();
-	loggerf("\tSaving options.", Level::DEBUG);
+	SimpleUI_Log("\tSaving options.", Level::DEBUG);
 	MCTD3_SaveOptions();
-	loggerf("MCTD3 has shut down.");
+	SimpleUI_Log("MCTD3 has shut down.");
 	return true;
 }

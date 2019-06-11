@@ -37,10 +37,18 @@ extern int framerateCap;
 extern std::string Title;
 extern int nextFrameTicks;
 extern int lastTime;
+extern unsigned int tickCount;
+extern Vec2 screenSize;
+extern double aspectRatio;
 
 extern bool MCTD3_EventLoop_running;
 extern bool MCTD3_RenderLoop_running;
 extern bool MCTD3_LogicLoop_running;
+
+extern bool MCTD3_restarting;
+extern bool MCTD3_closing;
+extern bool MCTD3_paused;
+extern bool MCTD3_fullscreen;
 
 extern std::string uiScriptPath;
 
