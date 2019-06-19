@@ -27,27 +27,28 @@ class Tile {
 		bool getBackground();
 
 		Tile operator=(const Tile& tile);
+
 	private:
-		std::string ID;
-		Frame* frame;
-		Vec2 Position;
+		std::string ID = "";
+		Frame* frame = nullptr;
+		Vec2 Position = Vec2(0, 0);
 		bool Background = false;
 };
 
 extern std::set<Tile*> Tiles;
 
 class Wave {
-public:
-	Wave() {}
+	public:
+		Wave() {}
 
-	std::map<std::string, int> Mobs;
+		std::map<std::string, int> Mobs = {};
 };
 
 class Map {
 	public:
 		Map() {}
 
-		std::set<Tile> MapTiles;
-		std::set<Wave> Waves;
-		Vec2 Bounds;
+		std::vector<Tile> MapTiles = {};
+		std::vector<Wave> Waves = {};
+		Vec2 Bounds = Vec2(0, 0);
 };

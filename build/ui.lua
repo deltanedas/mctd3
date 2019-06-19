@@ -3,26 +3,28 @@ if not SimpleUI then
 	os.exit(1)
 end
 
+-- using namespace SimpleUI;
+
 for i,v in pairs(SimpleUI) do
 	_ENV[i] = v
 end
---[[
+
 local label = Frame()
 local size = Size()
-	size.setScale(Vec2(0.4, 0.1))
-	label.setSize(size)
+	size:setScale(Vec2(0.4, 0.1))
+	label:setSize(size)
 local pos = Size()
-	pos.setScale(Vec2(0.3, 0.45))
-	label.setPosition(pos)
+	pos:setScale(Vec2(0.3, 0.45))
+	label:setPosition(pos)
 local text = Text(Fonts.minecraftia, "click block to mine it")
-	text.setScaleX()
-	text.setScaleY()
-	label.setText(text)
+	text:setScaleX()
+	text:setScaleY()
+	label:setText(text)
 local texture = Texture()
 	local colour = Colour(255, 128, 255, 100)
-	texture.setColour(colour)
-	label.setTexture(texture)
-label.setVisible()
-label.setAnchored()
-]]
+	texture:setColour(colour)
+	label:setTexture(texture)
+label:setVisible()
+label:setAnchored()
+
 SimpleUI_Log("done label shit", Level.DEBUG)

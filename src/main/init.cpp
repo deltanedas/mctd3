@@ -1,7 +1,13 @@
 #include "main/main.h"
 #include "luawrapper.h"
 
-using namespace luabridge; //I'm sorry but it'll drive me insane otherwise.
+FC_Font* CreateFont(std::string name) {
+	FC_Font* ret = FC_CreateFont();
+	if (name.compare("") != 0) {
+		fonts[name] = ret;
+	}
+	return ret;
+}
 
 bool MCTD3_InitSDL() {
 	SimpleUI_Log("Initialising SDL.", Level::DEBUG);
@@ -69,7 +75,7 @@ void oreDigCallback(EventType eventType);
 bool MCTD3_InitUI() {
 	SimpleUI_Log("Initialising UI.", Level::DEBUG);
 	initTextures();
-	FC_Font* minecraftFont = FC_CreateFont();
+	FC_Font* minecraftFont = CreateFont("minecraftia");
 	SDL_Color color = FC_MakeColor(0, 255, 0, 255);
 	Uint8 res = FC_LoadFont(minecraftFont, renderer, "assets/minecraftia.ttf", 24, color, TTF_STYLE_NORMAL);
 	SimpleUI_Log("Loaded font: " + std::to_string(res));

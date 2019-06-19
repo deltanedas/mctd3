@@ -40,6 +40,9 @@ extern int lastTime;
 extern unsigned int tickCount;
 extern Vec2 screenSize;
 extern double aspectRatio;
+extern std::map<std::string, FC_Font*> fonts;
+
+FC_Font* CreateFont(std::string name = "");
 
 extern bool MCTD3_EventLoop_running;
 extern bool MCTD3_RenderLoop_running;

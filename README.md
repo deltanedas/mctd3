@@ -12,8 +12,9 @@ You can use your own textures with the Packer/Unpacker programs in Packing.
 # Building
 
 **Dependencies**
-g++-8, SDL2, SDL2_image, SDL2_ttf, [SDL2_fontcache \(C++ version\)](https://github.com/deltanedas/SDL_fontcache/), [LuaBridge](https://github.com/vinniefalco/LuaBridge) pthread
-Move the Source/LuaBridge folder to /usr/include/ or src/
+g++-8, SDL2, SDL2_image, SDL2_ttf, [SDL2_fontcache \(C++ version\)](https://github.com/deltanedas/SDL_fontcache/), [LuaBridge](https://github.com/vinniefalco/LuaBridge), pthread
+
+Move the LuaBridge/Source/LuaBridge folder to /usr/include/ or src/
 
 **On \*NIX**
 1. `make run`

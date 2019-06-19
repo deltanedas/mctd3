@@ -11,28 +11,25 @@ OBJ = main mctd3 luawrapper main/fields main/functions main/init main/options ma
 OBJECTS = $(patsubst %, $(OBJECTDIR)/%.o, $(OBJ))
 
 DEBUGGER = valgrind
-DEBUGGERFLAGS = --track-origins=yes --leak-check=full
+DEBUGGERFLAGS = --track-origins=yes #--leak-check=full
 
 all: $(EXEC_FILE) packer
 
 run: $(EXEC_FILE)
-	cd $(BUILDDIR)
-	./$(EXEC_FILE)
+	cd $(BUILDDIR); ./$(EXEC_FILE)
 
 debug: $(EXEC_FILE)
-	cd $(BUILDDIR)
-	$(DEBUGGER) $(DEBUGGERFLAGS) ./$(EXEC_FILE) -d
+	cd $(BUILDDIR); $(DEBUGGER) $(DEBUGGERFLAGS) ./$(EXEC_FILE) -d
 
 $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.cpp
 	mkdir -p `dirname $@`
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJECTDIR)/main/%.o: $(SOURCEDIR)/main/%.cpp
-	mkdir -p $(OBJECTDIR)/main/
-	$(CXX) $(CXXFLAGS) -o $@ $^
+$(BUILDDIR)/$(EXEC_FILE): $(OBJECTS)
+	mkdir -p $(BUILDDIR)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-$(EXEC_FILE): $(OBJECTS)
-	$(CXX) -o $(BUILDDIR)/$@ $^ $(LDFLAGS)
+$(EXEC_FILE): $(BUILDDIR)/$(EXEC_FILE)
 
 clean:
 	rm -rf $(OBJECTDIR)
@@ -41,5 +38,5 @@ clean:
 remake: clean $(EXEC_FILE)
 
 packer:
-	cd packer
+	cd packer;
 	make

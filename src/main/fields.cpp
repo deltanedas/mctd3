@@ -1,6 +1,6 @@
 #include "main/main.h"
 
-std::map<std::string, int> options;
+std::map<std::string, int> options = {};
 int framerateCap = 60;
 std::string Title = "Minecraft Tower Defense III";
 int nextFrameTicks = 0;
@@ -8,6 +8,7 @@ int lastTime = 0;
 unsigned int tickCount = 0;
 Vec2 screenSize = Vec2(1, 1);
 double aspectRatio = 1;
+std::map<std::string, FC_Font*> fonts = {};
 
 int key_moveCameraUp = SDL_SCANCODE_W;
 int key_moveCameraDown = SDL_SCANCODE_S;
